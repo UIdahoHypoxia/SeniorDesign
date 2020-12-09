@@ -49,7 +49,7 @@ bool stringComplete = false;  // whether the string is complete
 int selection = 0;
 bool displayO2 = false;
 SoftwareSerial O2Serial(10,18); // RX, TX
-SoftwareSerial CO2Serial(11, 16); //RX TX
+//SoftwareSerial CO2Serial(11, 16); //RX TX
 void setup()
 {
    pinMode(SOL_1, OUTPUT);
@@ -66,7 +66,7 @@ void setup()
 
   // set the data rate for the SoftwareSerial port
   O2Serial.begin(9600);
-  CO2Serial.begin(9600);
+  //CO2Serial.begin(9600);
 }
 
 void loop() // run over and over
@@ -79,13 +79,13 @@ void loop() // run over and over
         Serial.println(Temperature);
         Serial.println(O2Percent);
   }
-  if (CO2Serial.available() && displayO2){
-        CO2Serial.print("Z\n\r");
-        CO2Reading = CO2Serial.readStringUntil('\n');
-        CO2PPM = CO2Reading.substring(2).toInt();
-        Serial.println(CO2Reading);
-        Serial.println(CO2PPM);
-  }
+//  if (CO2Serial.available() && displayO2){
+//        CO2Serial.print("Z\n\r");
+//        CO2Reading = CO2Serial.readStringUntil('\n');
+//        CO2PPM = CO2Reading.substring(2).toInt();
+//        Serial.println(CO2Reading);
+//        Serial.println(CO2PPM);
+//  }
   if(stringComplete) {  
     inputString.toLowerCase();  
     if(inputString.substring(0,4) == "open"){
