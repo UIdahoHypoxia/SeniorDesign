@@ -48,7 +48,7 @@ int CO2PPM;
 bool stringComplete = false;  // whether the string is complete
 int selection = 0;
 bool displayO2 = false;
-SoftwareSerial O2Serial(10,18); // RX, TX
+//SoftwareSerial O2Serial(10,18); // RX, TX
 //SoftwareSerial CO2Serial(11, 16); //RX TX
 void setup()
 {
@@ -65,27 +65,27 @@ void setup()
   Serial.println("Serial Connected");
 
   // set the data rate for the SoftwareSerial port
-  O2Serial.begin(9600);
-  //CO2Serial.begin(9600);
+  Serial1.begin(9600);
+  Serial2.begin(9600);
 }
 
 void loop() // run over and over
 {
-  if (O2Serial.available() && displayO2){
-        O2Reading = O2Serial.readStringUntil('\n');
-        Temperature = O2Reading.substring(12, 16).toFloat();
-        O2Percent = O2Reading.substring(26,32).toFloat();
-        Serial.println(O2Reading);
-        Serial.println(Temperature);
-        Serial.println(O2Percent);
-  }
-//  if (CO2Serial.available() && displayO2){
-//        CO2Serial.print("Z\n\r");
-//        CO2Reading = CO2Serial.readStringUntil('\n');
-//        CO2PPM = CO2Reading.substring(2).toInt();
-//        Serial.println(CO2Reading);
-//        Serial.println(CO2PPM);
+//  if (Serial1.available() && displayO2){
+//        O2Reading = Serial1.readStringUntil('\n');
+//        Temperature = O2Reading.substring(12, 16).toFloat();
+//        O2Percent = O2Reading.substring(26,32).toFloat();
+//        Serial.println(O2Reading);
+//        Serial.println(Temperature);
+//        Serial.println(O2Percent);
 //  }
+  if (Serial.available() && displayO2){
+        Serial2.write("Z\n\r");
+        CO2Reading = Serial2.readStringUntil('\n');
+        CO2PPM = CO2Reading.substring(2).toInt();
+        Serial.println(CO2Reading);
+        Serial.println(CO2PPM);
+  }
   if(stringComplete) {  
     inputString.toLowerCase();  
     if(inputString.substring(0,4) == "open"){
