@@ -35,6 +35,8 @@ void setup() {
   Serial.begin(9600);
 
   Serial1.begin(9600);
+
+  Serial2.begin(9600);
 }
 
 void loop() {
@@ -49,13 +51,20 @@ void loop() {
 
   }
 
+  if (Serial2.available()) {
+
+    int inByte = Serial2.read();
+
+    Serial.write(inByte);
+  }
+
   // read from port 0, send to port 1:
 
   if (Serial.available()) {
 
     int inByte = Serial.read();
 
-    Serial1.write(inByte);
+    Serial2.write(inByte);
 
   }
 }
