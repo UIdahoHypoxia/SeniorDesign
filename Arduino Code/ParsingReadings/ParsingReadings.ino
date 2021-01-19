@@ -64,7 +64,7 @@ void setup()
 
   Serial.println("Serial Connected");
 
-  // set the data rate for the SoftwareSerial port
+  // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   Serial1.begin(9600);
   Serial2.begin(9600);
 }
