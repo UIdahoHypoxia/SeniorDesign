@@ -31,7 +31,7 @@
   *   "read" - Begins reading the O2 sensor
   *   "stop" - stops the O2 readings from displaying
   */
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -71,23 +71,23 @@ void setup()
 
 void loop() // run over and over
 {
-//  if (Serial1.available() && displayO2){
-//        O2Reading = Serial1.readStringUntil('\n');
-//        Temperature = O2Reading.substring(12, 16).toFloat();
-//        O2Percent = O2Reading.substring(26,32).toFloat();
-//        Serial.println(O2Reading);
-//        Serial.println(Temperature);
-//        Serial.println(O2Percent);
-//  }
-  if (Serial.available() && displayO2){
-        Serial2.write("Z\n\r");
+  if (Serial1.available() && displayO2){
+        O2Reading = Serial1.readStringUntil('\n');
+        Temperature = O2Reading.substring(12, 16).toFloat();
+        O2Percent = O2Reading.substring(26,32).toFloat();
+        Serial.println(O2Reading);
+        Serial.println(Temperature);
+        Serial.println(O2Percent);
+  }
+  if (Serial2.available() && displayO2){
+        //Serial2.write("Z\n\r");
         CO2Reading = Serial2.readStringUntil('\n');
         CO2PPM = CO2Reading.substring(2).toInt();
         Serial.println(CO2Reading);
         Serial.println(CO2PPM);
   }
   if(stringComplete) {  
-    inputString.toLowerCase();  
+    //inputString.toLowerCase();  
     if(inputString.substring(0,4) == "open"){
       selection = inputString.substring(5).toInt();
       switch(selection){
@@ -140,9 +140,13 @@ void loop() // run over and over
       displayO2 = false;
     }
     else {
-       Serial.println(inputString);
-       Serial.println("Invalid Command");
+      Serial2.print(inputString);
+      Serial.println(inputString+" Command Sent");
     }
+//    else {
+//       Serial.println(inputString);
+//       Serial.println("Invalid Command");
+//    }
     inputString = "";
     stringComplete = false;
   }
