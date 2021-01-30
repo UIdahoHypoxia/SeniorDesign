@@ -35,19 +35,26 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SOL_1 22
-#define SOL_2 23
-#define SOL_3 24
+#define SOL_O2 22
+#define SOL_CO2 23
+#define SOL_Ex 24
+
+#define upperO2 25
+#define upperTime 100
+#define lowerTime 10
 
 String inputString;         // a String to hold incoming data
 String O2Reading;
 String CO2Reading;
 float Temperature;
 float O2Percent;
+float CO2Percent;
 int CO2PPM;
 bool displayO2 = false;
 
 bool ReadSerial = false;
+float CO2Setpoint = 5.0;
+float O2Setpoint = 5.0;
 
 //SoftwareSerial O2Serial(10,18); // RX, TX
 //SoftwareSerial CO2Serial(11, 16); //RX TX
@@ -58,9 +65,9 @@ HardwareSerial *CO2Serial = &Serial2;
 void setup()
 {
    
-   pinMode(SOL_1, OUTPUT);
-   pinMode(SOL_2, OUTPUT);
-   pinMode(SOL_3, OUTPUT);
+   pinMode(SOL_O2, OUTPUT);
+   pinMode(SOL_CO2, OUTPUT);
+   pinMode(SOL_Ex, OUTPUT);
    pinMode(LED_BUILTIN, OUTPUT);
    
   // Open serial communications and wait for port to open:
@@ -68,8 +75,6 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Native USB only
   }
-
-
   Serial.println("Serial Connected");
 
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
@@ -81,13 +86,15 @@ void setup()
 void loop() // run over and over
 {
   if(ReadSerial){
-    readings();
-    controlSolenoids();
+    readings(O2Setpoint, CO2Setpoint, &O2Percent, &CO2Percent);
+    ControlSolenoids(O2Percent, CO2Percent,O2Setpoint, CO2Setpoint);
     ReadSerial = false;
     
   }
+
   
-  if (O2Serial->available() && displayO2){
+  
+  /*if (O2Serial->available() && displayO2){
         O2Reading = O2Serial->readStringUntil('\n');
         Temperature = O2Reading.substring(12, 16).toFloat();
         O2Percent = O2Reading.substring(26,32).toFloat();
@@ -101,7 +108,7 @@ void loop() // run over and over
         CO2PPM = CO2Reading.substring(2).toInt();
         Serial.println(CO2Reading);
         Serial.println(CO2PPM);
-  }     
+  }  */   
 }
 
 void serialEvent() {

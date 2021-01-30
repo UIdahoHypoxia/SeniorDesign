@@ -6,18 +6,18 @@ void CommandParse(String input){
       selection = input.substring(5).toInt();
       switch(selection){
         case 0:
-          digitalWrite(SOL_1, 1);
-          digitalWrite(SOL_2, 1);
-          digitalWrite(SOL_3, 1);
+          digitalWrite(SOL_O2, 1);
+          digitalWrite(SOL_CO2, 1);
+          digitalWrite(SOL_Ex, 1);
           break;
         case 1:
-          digitalWrite(SOL_1, 1);
+          digitalWrite(SOL_O2, 1);
           break;
         case 2:
-          digitalWrite(SOL_2,1);
+          digitalWrite(SOL_CO2,1);
           break;
         case 3:
-          digitalWrite(SOL_3, 1);
+          digitalWrite(SOL_Ex, 1);
           break;
         default:
           Serial.print(selection);
@@ -29,24 +29,27 @@ void CommandParse(String input){
       selection = input.substring(6).toInt();
       switch(selection){
         case 0:
-          digitalWrite(SOL_1, 0);
-          digitalWrite(SOL_2, 0);
-          digitalWrite(SOL_3, 0);
+          digitalWrite(SOL_O2, 0);
+          digitalWrite(SOL_CO2, 0);
+          digitalWrite(SOL_Ex, 0);
           break;
         case 1:
-          digitalWrite(SOL_1, 0);
+          digitalWrite(SOL_O2, 0);
           break;
         case 2:
-          digitalWrite(SOL_2,0);
+          digitalWrite(SOL_CO2,0);
           break;
         case 3:
-          digitalWrite(SOL_3, 0);
+          digitalWrite(SOL_Ex, 0);
           break;
         default:
           Serial.println("Error, invalid solenoid to Close");
       }
        Serial.println(input);
     } 
+    else if(input.substring(0,2) == "O2") {
+      O2Setpoint = input.substring(3).toFloat();
+    }
     else if(input.substring(0,4) == "read") {
       displayO2 = true;
     } 
@@ -59,8 +62,51 @@ void CommandParse(String input){
     }
 }
 
-void ControlSolenoids(
+void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2Set){
+  float timeOpenO2, timeOpenCO2;
+  if((O2Percent - O2Set) > 0.1){
+    timeOpenO2 = ((upperTime * (O2Percent-O2Set)) + lowerTime*(upperO2-O2Set))/((O2Percent-O2Set)+(upperO2-O2Set));
+    Serial.println(timeOpenO2);
+    digitalWrite(LED_BUILTIN, 1);
+    digitalWrite(SOL_Ex, 1);
+    digitalWrite(SOL_O2, 1);
+    delay(timeOpenO2);
+    digitalWrite(LED_BUILTIN, 0);
+    digitalWrite(SOL_O2, 0);
+    digitalWrite(SOL_Ex, 0);
+  }
 
+  if((CO2Percent - O2Set) > 0.1){
+    timeOpenCO2 = ((upperTime * (CO2Percent-CO2Set)) + lowerTime*(upperO2-CO2Set))/((CO2Percent-CO2Set)+(upperO2-CO2Set));
+    Serial.println(timeOpenCO2);
+    digitalWrite(LED_BUILTIN, 1);
+    digitalWrite(SOL_Ex, 1);
+    digitalWrite(SOL_CO2, 1);
+    delay(timeOpenCO2);
+    digitalWrite(LED_BUILTIN, 0);
+    digitalWrite(SOL_CO2, 0);
+    digitalWrite(SOL_Ex, 0);
+  }
+  
+}
+
+int readings(float O2Setpoint, float CO2Setpoint, float *O2Percent, float *CO2Percent) {
+  String CO2Reading, O2Reading;
+  CO2Serial->write("Z\n\r");
+  if (CO2Serial->available()) {
+    CO2Reading = CO2Serial->readStringUntil('\n');
+    *CO2Percent = CO2Reading.substring(2).toFloat()/1000;
+    Serial.println(CO2Reading);
+  }
+  if (O2Serial->available()) {
+    O2Reading = O2Serial->readStringUntil('\n');
+    *O2Percent = O2Reading.substring(26,32).toFloat();
+    Serial.println(O2Reading);
+    Serial.println(*O2Percent);
+  }
+
+  return 1;
+}
 
 void setupTimer(int CompareMatch){
   cli();
