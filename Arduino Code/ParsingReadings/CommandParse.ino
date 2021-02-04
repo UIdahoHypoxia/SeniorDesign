@@ -65,7 +65,9 @@ void CommandParse(String input){
 void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2Set){
   float timeOpenO2, timeOpenCO2;
   if((O2Percent - O2Set) > 0.1){
-    timeOpenO2 = ((upperTime * (O2Percent-O2Set)) + lowerTime*(upperO2-O2Set))/((O2Percent-O2Set)+(upperO2-O2Set));
+    float a = (upperO2-O2Percent);
+    float b = (O2Percent - O2Set);
+    timeOpenO2 = ((upperTime * b + lowerTime*a)/(a+b));
     Serial.println(timeOpenO2);
     digitalWrite(LED_BUILTIN, 1);
     digitalWrite(SOL_Ex, 1);
@@ -76,8 +78,10 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
     digitalWrite(SOL_Ex, 0);
   }
 
-  if((CO2Percent - O2Set) > 0.1){
-    timeOpenCO2 = ((upperTime * (CO2Percent-CO2Set)) + lowerTime*(upperO2-CO2Set))/((CO2Percent-CO2Set)+(upperO2-CO2Set));
+  if((CO2Percent - CO2Set) > 0.1){
+    float a = (CO2Set - CO2Percent);
+    float b = (CO2Percent - lowerCO2);
+    timeOpenCO2 = ((upperTime * a + lowerTime*b)/(a+b));
     Serial.println(timeOpenCO2);
     digitalWrite(LED_BUILTIN, 1);
     digitalWrite(SOL_Ex, 1);
@@ -90,22 +94,28 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
   
 }
 
-int readings(float O2Setpoint, float CO2Setpoint, float *O2Percent, float *CO2Percent) {
+void readings( float *O2Percent, float *CO2Percent) {
   String CO2Reading, O2Reading;
-  CO2Serial->write("Z\n\r");
+  //CO2Serial->write("Z\n\r");
+  
+  if (O2Serial->available()) {    
+    O2Reading = O2Serial->readStringUntil('\n');
+    if(O2Reading.length() < 42){
+      *O2Percent = O2Reading.substring(26,32).toFloat();
+      Serial.println(O2Reading);
+      Serial.println(*O2Percent);
+    } else {
+      Serial.println(O2Reading);
+      Serial.println(O2Reading.length());
+      *O2Percent = 100;
+    }
+  }
   if (CO2Serial->available()) {
     CO2Reading = CO2Serial->readStringUntil('\n');
     *CO2Percent = CO2Reading.substring(2).toFloat()/1000;
     Serial.println(CO2Reading);
   }
-  if (O2Serial->available()) {
-    O2Reading = O2Serial->readStringUntil('\n');
-    *O2Percent = O2Reading.substring(26,32).toFloat();
-    Serial.println(O2Reading);
-    Serial.println(*O2Percent);
-  }
 
-  return 1;
 }
 
 void setupTimer(int CompareMatch){

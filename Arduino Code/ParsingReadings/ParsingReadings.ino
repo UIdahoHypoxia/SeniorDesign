@@ -40,6 +40,7 @@
 #define SOL_Ex 24
 
 #define upperO2 25
+#define lowerCO2 0
 #define upperTime 100
 #define lowerTime 10
 
@@ -86,8 +87,10 @@ void setup()
 void loop() // run over and over
 {
   if(ReadSerial){
-    readings(O2Setpoint, CO2Setpoint, &O2Percent, &CO2Percent);
-    ControlSolenoids(O2Percent, CO2Percent,O2Setpoint, CO2Setpoint);
+    readings(&O2Percent, &CO2Percent);
+    if(O2Percent <= 25 && CO2Percent <= 10) {
+      ControlSolenoids(O2Percent, CO2Percent,O2Setpoint, CO2Setpoint);
+    }
     ReadSerial = false;
     
   }
