@@ -89,7 +89,7 @@ void loop() // run over and over
   if(ReadSerial){
     readings(&O2Percent, &CO2Percent);
     if(O2Percent <= 25 && CO2Percent <= 10) {
-      ControlSolenoids(O2Percent, CO2Percent,O2Setpoint, CO2Setpoint);
+      ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
     }
     ReadSerial = false;
     

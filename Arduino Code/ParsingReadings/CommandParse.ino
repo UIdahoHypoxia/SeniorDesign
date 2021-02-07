@@ -56,6 +56,9 @@ void CommandParse(String input){
     else if(input.substring(0,4) == "stop") {
       displayO2 = false;
     }
+    else if(input.substring(0,1) == "Z") {
+      CO2Serial->print(input);
+    }
     else {
        Serial.println(input);
        Serial.println("Invalid Command");
@@ -78,7 +81,7 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
     digitalWrite(SOL_Ex, 0);
   }
 
-  if((CO2Percent - CO2Set) > 0.1){
+  if((CO2Set - CO2Percent) > 0.1){
     float a = (CO2Set - CO2Percent);
     float b = (CO2Percent - lowerCO2);
     timeOpenCO2 = ((upperTime * a + lowerTime*b)/(a+b));
@@ -96,7 +99,7 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
 
 void readings( float *O2Percent, float *CO2Percent) {
   String CO2Reading, O2Reading;
-  //CO2Serial->write("Z\n\r");
+  CO2Serial->println("Z\n\r");
   
   if (O2Serial->available()) {    
     O2Reading = O2Serial->readStringUntil('\n');
@@ -106,14 +109,19 @@ void readings( float *O2Percent, float *CO2Percent) {
       Serial.println(*O2Percent);
     } else {
       Serial.println(O2Reading);
-      Serial.println(O2Reading.length());
       *O2Percent = 100;
     }
   }
   if (CO2Serial->available()) {
     CO2Reading = CO2Serial->readStringUntil('\n');
-    *CO2Percent = CO2Reading.substring(2).toFloat()/1000;
-    Serial.println(CO2Reading);
+    if((CO2Reading.length() < 9) && (CO2Reading.substring(0,1) != "E")) {
+      *CO2Percent = CO2Reading.substring(2,7).toFloat()/1000;
+      Serial.println(CO2Reading);
+      Serial.println(*CO2Percent,3);
+    } else {
+      Serial.println(CO2Reading);
+      *CO2Percent = 100;
+    }
   }
 
 }
