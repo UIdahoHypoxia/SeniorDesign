@@ -93,26 +93,9 @@ void loop() // run over and over
     }
     ReadSerial = false;
     
-  }
-
-  
-  
-  /*if (O2Serial->available() && displayO2){
-        O2Reading = O2Serial->readStringUntil('\n');
-        Temperature = O2Reading.substring(12, 16).toFloat();
-        O2Percent = O2Reading.substring(26,32).toFloat();
-        Serial.println(O2Reading);
-        Serial.println(Temperature);
-        Serial.println(O2Percent);
-  }
-  if (CO2Serial->available() && displayO2){
-        //Serial2.write("Z\n\r");
-        CO2Reading = CO2Serial->readStringUntil('\n');
-        CO2PPM = CO2Reading.substring(2).toInt();
-        Serial.println(CO2Reading);
-        Serial.println(CO2PPM);
-  }  */   
+  }  
 }
+
 
 void serialEvent() {
   

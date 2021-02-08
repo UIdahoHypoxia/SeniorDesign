@@ -67,20 +67,6 @@ void CommandParse(String input){
 
 void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2Set){
   float timeOpenO2, timeOpenCO2;
-  if((O2Percent - O2Set) > 0.1){
-    float a = (upperO2-O2Percent);
-    float b = (O2Percent - O2Set);
-    timeOpenO2 = ((upperTime * b + lowerTime*a)/(a+b));
-    Serial.println(timeOpenO2);
-    digitalWrite(LED_BUILTIN, 1);
-    digitalWrite(SOL_Ex, 1);
-    digitalWrite(SOL_O2, 1);
-    delay(timeOpenO2);
-    digitalWrite(LED_BUILTIN, 0);
-    digitalWrite(SOL_O2, 0);
-    digitalWrite(SOL_Ex, 0);
-  }
-
   if((CO2Set - CO2Percent) > 0.1){
     float a = (CO2Set - CO2Percent);
     float b = (CO2Percent - lowerCO2);
@@ -94,7 +80,22 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
     digitalWrite(SOL_CO2, 0);
     digitalWrite(SOL_Ex, 0);
   }
-  
+
+  if ((CO2Set - CO2Percent) < 0.5) {
+    if((O2Percent - O2Set) > 0.1){
+      float a = (upperO2-O2Percent);
+      float b = (O2Percent - O2Set);
+      timeOpenO2 = ((upperTime * b + lowerTime*a)/(a+b));
+      Serial.println(timeOpenO2);
+      digitalWrite(LED_BUILTIN, 1);
+      digitalWrite(SOL_Ex, 1);
+      digitalWrite(SOL_O2, 1);
+      delay(timeOpenO2);
+      digitalWrite(LED_BUILTIN, 0);
+      digitalWrite(SOL_O2, 0);
+      digitalWrite(SOL_Ex, 0);
+    }
+  }
 }
 
 void readings( float *O2Percent, float *CO2Percent) {
