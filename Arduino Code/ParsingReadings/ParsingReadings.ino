@@ -50,6 +50,9 @@ String CO2Reading;
 float Temperature;
 float O2Percent;
 float CO2Percent;
+float Temp;
+float Humidity;
+float Pressure;
 int CO2PPM;
 bool displayO2 = false;
 
@@ -87,7 +90,7 @@ void setup()
 void loop() // run over and over
 {
   if(ReadSerial){
-    readings(&O2Percent, &CO2Percent);
+    readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
     if(O2Percent <= 25 && CO2Percent <= 10) {
       ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
     }

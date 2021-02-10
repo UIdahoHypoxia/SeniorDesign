@@ -98,16 +98,18 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
   }
 }
 
-void readings( float *O2Percent, float *CO2Percent) {
-  String CO2Reading, O2Reading;
+void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity, float *Pressure) {
+  String CO2Reading, O2Reading, HReading, PReading;
   CO2Serial->println("Z\n\r");
-  
+  delay(15);
   if (O2Serial->available()) {    
     O2Reading = O2Serial->readStringUntil('\n');
     if(O2Reading.length() < 42){
       *O2Percent = O2Reading.substring(26,32).toFloat();
+      *Temp = O2Reading.substring(12,16).toFloat();
       Serial.println(O2Reading);
       Serial.println(*O2Percent);
+      Serial.println(*Temp);
     } else {
       Serial.println(O2Reading);
       *O2Percent = 100;
@@ -122,6 +124,32 @@ void readings( float *O2Percent, float *CO2Percent) {
     } else {
       Serial.println(CO2Reading);
       *CO2Percent = 100;
+    }
+  }
+
+  CO2Serial->println("H\n\r");
+  delay(15);
+  if (CO2Serial->available()) {
+    HReading = CO2Serial->readStringUntil('\n');
+    if((HReading.length() < 9) && (HReading.substring(0,1) != "E")) {
+      *Humidity = HReading.substring(2,7).toFloat()/10;
+      Serial.println(HReading);
+      Serial.println(*Humidity);
+    } else {
+      Serial.println(HReading);
+    }
+  }
+
+  CO2Serial->println("B\n\r");
+  delay(15);
+  if (CO2Serial->available()) {
+    PReading = CO2Serial->readStringUntil('\n');
+    if((PReading.length() < 9) && (PReading.substring(0,1) != "E")) {
+      *Pressure = PReading.substring(2,7).toFloat();
+      Serial.println(PReading);
+      Serial.println(*Pressure);
+    } else {
+      Serial.println(PReading);
     }
   }
 
