@@ -2,6 +2,7 @@
 
 void CommandParse(String input){
   int selection = 0;
+  String CO2Reading;
   if(input.substring(0,4) == "open"){
       selection = input.substring(5).toInt();
       switch(selection){
@@ -56,8 +57,12 @@ void CommandParse(String input){
     else if(input.substring(0,4) == "stop") {
       displayO2 = false;
     }
-    else if(input.substring(0,1) == "Z") {
-      CO2Serial->print(input);
+    else if(input.substring(0,3) == "CO2") {
+      CO2Serial->print(input.substring(4));
+      if (CO2Serial->available()) {
+        CO2Reading = CO2Serial->readStringUntil('\n');
+        Serial.println(CO2Reading);
+      }
     }
     else {
        Serial.println(input);
@@ -126,6 +131,8 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
       *CO2Percent = 100;
     }
   }
+
+  /**
   delay(30);
   CO2Serial->println("H\n\r");
   delay(30);
@@ -151,7 +158,7 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     } else {
       Serial.println(PReading);
     }
-  }
+  }*/
 
 }
 
