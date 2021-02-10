@@ -84,7 +84,7 @@ void setup()
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   O2Serial->begin(9600);
   CO2Serial->begin(9600);
-  setupTimer(31300);
+  setupTimer(15624);
 }
 
 void loop() // run over and over
@@ -95,13 +95,12 @@ void loop() // run over and over
       ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
     }
     ReadSerial = false;
-
-    if (CO2Serial->available()) {
+    
+  }  
+  if (CO2Serial->available()) {
         CO2ReadingTest = CO2Serial->readStringUntil('\n');
         Serial.println(CO2ReadingTest);
     }
-    
-  }  
 }
 
 
