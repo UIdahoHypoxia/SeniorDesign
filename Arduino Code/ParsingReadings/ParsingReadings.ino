@@ -65,7 +65,7 @@ float O2Setpoint = 5.0;
 HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
 
-
+String CO2ReadingTest;
 void setup()
 {
    
@@ -95,6 +95,11 @@ void loop() // run over and over
       ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
     }
     ReadSerial = false;
+
+    if (CO2Serial->available()) {
+        CO2ReadingTest = CO2Serial->readStringUntil('\n');
+        Serial.println(CO2ReadingTest);
+    }
     
   }  
 }
