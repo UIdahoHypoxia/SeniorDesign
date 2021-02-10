@@ -84,7 +84,7 @@ void setup()
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   O2Serial->begin(9600);
   CO2Serial->begin(9600);
-  setupTimer(15624);
+  setupTimer(31300);
 }
 
 void loop() // run over and over
