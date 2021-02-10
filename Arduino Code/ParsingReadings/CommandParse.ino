@@ -106,7 +106,7 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
 void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity, float *Pressure) {
   String CO2Reading, O2Reading, HReading, PReading;
   String scrap;
-  CO2Serial->println("Z\n\r");
+  CO2Serial->println("Z");
 
   if (O2Serial->available()) {    
     O2Reading = O2Serial->readStringUntil('\n');
@@ -121,24 +121,30 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
       *O2Percent = 100;
     }
   }
+  delay(50);
   if (CO2Serial->available()) {
     CO2Reading = CO2Serial->readStringUntil('\n');
+//    if (CO2Reading.substring(0,1) != "Z") {
+//       CO2Reading = CO2Serial->readStringUntil('\n');
+//       Serial.println("yes");
+//    }
     if((CO2Reading.length() < 9) && (CO2Reading.substring(0,1) != "E")) {
       *CO2Percent = CO2Reading.substring(2,7).toFloat()/1000;
       Serial.println(CO2Reading);
       Serial.println(*CO2Percent,3);
     } else {
-      Serial.println(CO2Reading);
+      Serial.println("135="+CO2Reading);
       *CO2Percent = 100;
     }
-    scrap = CO2Serial -> readStringUntil('\n');
-    Serial.println(scrap);
   }
 
   delay(50);
-  CO2Serial->println("H\n\r");
+  CO2Serial->println("H");
   if (CO2Serial->available()) {
     HReading = CO2Serial->readStringUntil('\n');
+//    if (HReading.substring(0,1) != "H") {
+//       HReading = CO2Serial->readStringUntil('\n');
+//    }
     if((HReading.length() < 9) && (HReading.substring(0,1) != "E")) {
       *Humidity = HReading.substring(2,7).toFloat()/10;
       Serial.println(HReading);
@@ -146,13 +152,14 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     } else {
       Serial.println(HReading);
     }
-    scrap = CO2Serial -> readStringUntil('\n');
-    Serial.println(scrap);
   }
   delay(50);
-  CO2Serial->println("B\n\r");
+  CO2Serial->println("B");
   if (CO2Serial->available()) {
     PReading = CO2Serial->readStringUntil('\n');
+//    if (PReading.substring(0,1) != "B") {
+//       PReading = CO2Serial->readStringUntil('\n');
+//    }
     if((PReading.length() < 9) && (PReading.substring(0,1) != "E")) {
       *Pressure = PReading.substring(2,7).toFloat();
       Serial.println(PReading);
@@ -160,8 +167,8 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     } else {
       Serial.println(PReading);
     }
-    scrap = CO2Serial -> readStringUntil('\n');
-    Serial.println(scrap);
+//    scrap = CO2Serial -> readStringUntil('\n');
+//    Serial.println("scrap3="+scrap);
   }
 
 }
