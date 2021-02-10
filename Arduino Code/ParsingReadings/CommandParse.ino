@@ -105,6 +105,7 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
 
 void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity, float *Pressure) {
   String CO2Reading, O2Reading, HReading, PReading;
+  String scrap;
   CO2Serial->println("Z\n\r");
 
   if (O2Serial->available()) {    
@@ -130,6 +131,8 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
       Serial.println(CO2Reading);
       *CO2Percent = 100;
     }
+    scrap = CO2Serial -> readStringUntil('\n');
+    Serial.println(scrap);
   }
 
   delay(50);
@@ -143,6 +146,8 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     } else {
       Serial.println(HReading);
     }
+    scrap = CO2Serial -> readStringUntil('\n');
+    Serial.println(scrap);
   }
   delay(50);
   CO2Serial->println("B\n\r");
@@ -155,6 +160,8 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     } else {
       Serial.println(PReading);
     }
+    scrap = CO2Serial -> readStringUntil('\n');
+    Serial.println(scrap);
   }
 
 }

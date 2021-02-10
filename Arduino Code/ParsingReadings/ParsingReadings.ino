@@ -97,10 +97,10 @@ void loop() // run over and over
     ReadSerial = false;
     
   }  
-  if (CO2Serial->available()) {
-        CO2ReadingTest = CO2Serial->readStringUntil('\n');
-        Serial.println(CO2ReadingTest);
-    }
+//  if (CO2Serial->available()) {
+//        CO2ReadingTest = CO2Serial->readStringUntil('\n');
+//        Serial.println(CO2ReadingTest);
+//    }
 }
 
 
