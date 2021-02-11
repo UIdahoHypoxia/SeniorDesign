@@ -61,7 +61,7 @@ void CommandParse(String input){
       CO2Serial->print(input.substring(4));
       if (CO2Serial->available()) {
         CO2Reading = CO2Serial->readStringUntil('\n');
-        Serial.println(CO2Reading);
+        Serial.println("CO2 Command Return" + CO2Reading);
       }
     }
     else {
@@ -113,9 +113,9 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
     if(O2Reading.length() < 42){
       *O2Percent = O2Reading.substring(26,32).toFloat();
       *Temp = O2Reading.substring(12,16).toFloat();
-      Serial.println(O2Reading);
-      Serial.println(*O2Percent);
-      Serial.println(*Temp);
+      Serial.println("O2:"+O2Reading);
+      Serial.println("O2%:"+ (String)*O2Percent);
+      Serial.println("O2 T:"+ (String)*Temp);
     } else {
       Serial.println(O2Reading);
       *O2Percent = 100;
@@ -130,16 +130,17 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
 //    }
     if((CO2Reading.length() < 9) && (CO2Reading.substring(0,1) != "E")) {
       *CO2Percent = CO2Reading.substring(2,7).toFloat()/1000;
-      Serial.println(CO2Reading);
-      Serial.println(*CO2Percent,3);
+      Serial.println("CO2:"+CO2Reading);
+      Serial.println("CO2 %:" + (String)*CO2Percent);
     } else {
-      Serial.println("135="+CO2Reading);
+      Serial.println("CO2 Bad="+CO2Reading);
       *CO2Percent = 100;
     }
   }
 
   delay(50);
   CO2Serial->println("H");
+  delay(50);
   if (CO2Serial->available()) {
     HReading = CO2Serial->readStringUntil('\n');
 //    if (HReading.substring(0,1) != "H") {
@@ -147,25 +148,26 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
 //    }
     if((HReading.length() < 9) && (HReading.substring(0,1) != "E")) {
       *Humidity = HReading.substring(2,7).toFloat()/10;
-      Serial.println(HReading);
-      Serial.println(*Humidity);
+      Serial.println("H:" + HReading);
+      Serial.println("H %:" + (String)*Humidity);
     } else {
-      Serial.println(HReading);
+      Serial.println("H Bad:" +HReading);
     }
   }
   delay(50);
   CO2Serial->println("B");
+  delay(50);
   if (CO2Serial->available()) {
     PReading = CO2Serial->readStringUntil('\n');
 //    if (PReading.substring(0,1) != "B") {
 //       PReading = CO2Serial->readStringUntil('\n');
 //    }
     if((PReading.length() < 9) && (PReading.substring(0,1) != "E")) {
-      *Pressure = PReading.substring(2,7).toFloat();
-      Serial.println(PReading);
-      Serial.println(*Pressure);
+      *Pressure = PReading.substring(2,7).toFloat()/10;
+      Serial.println("P: " + PReading);
+      Serial.println("P #: " + (String)*Pressure);
     } else {
-      Serial.println(PReading);
+      Serial.println("P Bad: " +PReading);
     }
 //    scrap = CO2Serial -> readStringUntil('\n');
 //    Serial.println("scrap3="+scrap);

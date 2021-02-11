@@ -44,6 +44,8 @@
 #define upperTime 100
 #define lowerTime 10
 
+#define readTime 1
+
 String inputString;         // a String to hold incoming data
 String O2Reading;
 String CO2Reading;
@@ -65,7 +67,7 @@ float O2Setpoint = 5.0;
 HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
 
-String CO2ReadingTest;
+String O2ReadingTest;
 void setup()
 {
    
@@ -89,14 +91,23 @@ void setup()
 
 void loop() // run over and over
 {
+  static int timerDelay = 0;
   if(ReadSerial){
-    readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-    if(O2Percent <= 25 && CO2Percent <= 10) {
-      ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
+    if(timerDelay == readTime){
+      readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+      if(O2Percent <= 25 && CO2Percent <= 10) {
+        ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
+      }
+      timerDelay = 0;
+    } else if(timerDelay == readTime-1){
+        if (O2Serial->available()) {
+            O2ReadingTest = O2Serial->readStringUntil('\n');
+        }
     }
     ReadSerial = false;
-    
+    timerDelay++;    
   }  
+  
 //  if (CO2Serial->available()) {
 //        CO2ReadingTest = CO2Serial->readStringUntil('\n');
 //        Serial.println(CO2ReadingTest);
