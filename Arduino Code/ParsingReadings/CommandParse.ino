@@ -103,11 +103,11 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
   }
 }
 
-void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity, float *Pressure) {
+int readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity, float *Pressure) {
   String CO2Reading, O2Reading, HReading, PReading;
   String scrap;
   CO2Serial->println("Z");
-
+  int retval = 1;
   if (O2Serial->available()) {    
     O2Reading = O2Serial->readStringUntil('\n');
     if(O2Reading.length() < 42){
@@ -117,8 +117,9 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
       Serial.println("O2%:"+ (String)*O2Percent);
       Serial.println("O2 T:"+ (String)*Temp);
     } else {
-      Serial.println(O2Reading);
+      Serial.println("Bad O2:" + O2Reading);
       *O2Percent = 100;
+      retval = 0;
     }
   }
   delay(50);
@@ -172,6 +173,7 @@ void readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity
 //    scrap = CO2Serial -> readStringUntil('\n');
 //    Serial.println("scrap3="+scrap);
   }
+  return retval;
 
 }
 
@@ -189,6 +191,16 @@ void setupTimer(int CompareMatch){
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   sei();
+}
+
+int CheckTime(unsigned long *previous, unsigned long delay){
+  unsigned long currentTime = millis();
+  int retval = 0;
+  if(currentTime - *previous >= delay){
+    retval = 1;
+    *previous = currentTime;
+  }
+  return retval;
 }
 
 ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)

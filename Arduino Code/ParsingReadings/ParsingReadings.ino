@@ -44,7 +44,7 @@
 #define upperTime 100
 #define lowerTime 10
 
-#define readTime 1
+#define readTime 15
 
 String inputString;         // a String to hold incoming data
 String O2Reading;
@@ -86,12 +86,12 @@ void setup()
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   O2Serial->begin(9600);
   CO2Serial->begin(9600);
-  setupTimer(15624);
+  //setupTimer(15624);
 }
 
 void loop() // run over and over
 {
-  static int timerDelay = 0;
+  /*static int timerDelay = 0;
   if(ReadSerial){
     if(timerDelay == readTime){
       readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
@@ -106,6 +106,23 @@ void loop() // run over and over
     }
     ReadSerial = false;
     timerDelay++;    
+  }  */
+
+
+  static unsigned long previous = millis();
+  
+  static unsigned long previous2 = millis();
+  int good = 0;
+  if(CheckTime(&previous, readTime*1000)){
+      good = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+      if(O2Percent <= 25 && CO2Percent <= 10) {
+        ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
+      }
+      previous2 = previous;
+  } 
+  if(good == 1){
+      Serial.println("Offset:");
+      good = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
   }  
   
 //  if (CO2Serial->available()) {
