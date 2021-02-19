@@ -1,37 +1,21 @@
 /*
-  Software serial multple serial test
-
- Receives from the hardware serial, sends to software serial.
- Receives from software serial, sends to hardware serial.
-
- The circuit:
- * RX is digital pin 0 (connect to TX of other device)
- * TX is digital pin 1 (connect to RX of other device)
-
- Note:
- Not all pins on the Mega and Mega 2560 support change interrupts,
- so only the following can be used for RX:
- 10, 11, 12, 13, 50, 51, 52, 53, 62, 63, 64, 65, 66, 67, 68, 69
-
-
- */
-
- /*
+  *
   * The First test software for parsing O2 and CO2 Readings
   * 
   * Setup:
   * 
-  *   O2 Rx - pin 10
+  *   O2 Rx - pin 19 - RX1
+  *   O2 Tx - pin 18 - TX1
+  *   
+  *   CO2 RX - pin 17 - RX2
+  *   CO2 Tx - Pin 16 - TX2
   *   
   * Open up the serial monitor with a baud rate of 9600 and type commands to control the system
   * 
   * Commands:
   *   "open x" - opens solenoids 1-3 anything other than 1-3 will open all of them
   *   "close x" - closes solenoid x where x is 1-3 anything other than 1-3 closes all of them
-  *   "read" - Begins reading the O2 sensor
-  *   "stop" - stops the O2 readings from displaying
   */
-//#include <SoftwareSerial.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -39,16 +23,18 @@
 #define SOL_CO2 23
 #define SOL_Ex 24
 
-#define upperO2 25
-#define lowerCO2 0
-#define upperTime 100
-#define lowerTime 10
+#define upperO2 25      // upper limit of the O2 sensor
+#define lowerCO2 0      // Lower limit of the CO2 sensor
+#define upperTime 100   // Max time the solenoid can open for at once
+#define lowerTime 10    // Min time for solenoid opening
 
-#define readTime 15
+#define readTime 3     // Time between sensor readings and solenoids, in seconds
+
+float CO2Setpoint = 5.0;
+float O2Setpoint = 5.0;
+
 
 String inputString;         // a String to hold incoming data
-String O2Reading;
-String CO2Reading;
 float Temperature;
 float O2Percent;
 float CO2Percent;
@@ -56,18 +42,12 @@ float Temp;
 float Humidity;
 float Pressure;
 int CO2PPM;
-bool displayO2 = false;
 
-bool ReadSerial = false;
-float CO2Setpoint = 5.0;
-float O2Setpoint = 5.0;
+//bool ReadSerial = false; // Outdated, used with the timer
 
-//SoftwareSerial O2Serial(10,18); // RX, TX
-//SoftwareSerial CO2Serial(11, 16); //RX TX
 HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
 
-String O2ReadingTest;
 void setup()
 {
    
@@ -108,30 +88,26 @@ void loop() // run over and over
     timerDelay++;    
   }  */
 
-
+  
   static unsigned long previous = millis();
+  // Used to track if when readings() is called it receives a good O2 reading.
+  // 1: Good last reading
+  // 0: Bad last reading
+  //The goal is to always have read a poor reading in the off cycle and not calculate based on it so that the good reading comes through at the Delay time
+  int goodReading = 0; 
   
-  static unsigned long previous2 = millis();
-  int good = 0;
-  if(CheckTime(&previous, readTime*1000)){
-      good = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-      if(O2Percent <= 25 && CO2Percent <= 10) {
-        ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
-      }
-      previous2 = previous;
+  if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
+      goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+      ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
   } 
-  if(good == 1){
+  if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
       Serial.println("Offset:");
-      good = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-  }  
-  
-//  if (CO2Serial->available()) {
-//        CO2ReadingTest = CO2Serial->readStringUntil('\n');
-//        Serial.println(CO2ReadingTest);
-//    }
+      goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+  }
 }
 
 
+//Used to capture the serial command inputs sent by the user over the serial 1 line.
 void serialEvent() {
   
   while (Serial.available()) {
