@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define Debug 0
+
 #define SOL_O2 22
 #define SOL_CO2 23
 #define SOL_Ex 24
@@ -38,6 +40,8 @@ String inputString;         // a String to hold incoming data
 float Temperature;
 float O2Percent;
 float CO2Percent;
+float O2Solenoid;
+float CO2Solenoid;
 float Temp;
 float Humidity;
 float Pressure;
@@ -62,33 +66,15 @@ void setup()
     ; // wait for serial port to connect. Needed for Native USB only
   }
   Serial.println("Serial Connected");
+  Serial.println("O2, CO2, Temp, Humid, Pressure, O2Solenoid, CO2Solenoid");
 
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   O2Serial->begin(9600);
   CO2Serial->begin(9600);
-  //setupTimer(15624);
 }
 
 void loop() // run over and over
-{
-  /*static int timerDelay = 0;
-  if(ReadSerial){
-    if(timerDelay == readTime){
-      readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-      if(O2Percent <= 25 && CO2Percent <= 10) {
-        ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
-      }
-      timerDelay = 0;
-    } else if(timerDelay == readTime-1){
-        if (O2Serial->available()) {
-            O2ReadingTest = O2Serial->readStringUntil('\n');
-        }
-    }
-    ReadSerial = false;
-    timerDelay++;    
-  }  */
-
-  
+{  
   static unsigned long previous = millis();
   // Used to track if when readings() is called it receives a good O2 reading.
   // 1: Good last reading
@@ -98,7 +84,21 @@ void loop() // run over and over
   
   if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
       goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-      ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint);
+      ControlSolenoids(O2Percent, CO2Percent, O2Setpoint, CO2Setpoint, &O2Solenoid, &CO2Solenoid);
+      Serial.print(O2Percent);
+      Serial.print(",");
+      Serial.print(CO2Percent);
+      Serial.print(",");
+      Serial.print(Temp);
+      Serial.print(",");
+      Serial.print(Humidity);
+      Serial.print(",");
+      Serial.print(Pressure);
+      Serial.print(",");
+      Serial.print(O2Solenoid);
+      Serial.print(",");
+      Serial.print(CO2Solenoid);
+      Serial.print("\n");
   } 
   if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
       Serial.println("Offset:");
