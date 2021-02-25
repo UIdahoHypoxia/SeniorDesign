@@ -58,6 +58,9 @@ void CommandParse(String input){
         Serial.println("CO2 Command Return" + CO2Reading);
       }
     }
+    else if(input.substring(0,5) == "Debug"){
+      Debug = (Debug+1)%2;
+    }
     else {
        Serial.println(input);
        Serial.println("Invalid Command");
@@ -80,8 +83,9 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
       digitalWrite(SOL_Ex, 0);
     }
   }
+  delay(50);
   if (O2Percent <= 25) {
-    if ((CO2Set - CO2Percent) < 0.5) {
+    //if ((CO2Set - CO2Percent) < 0.5) {
       if((O2Percent - O2Set) > 0.1){
         float a = (upperO2-O2Percent);
         float b = (O2Percent - O2Set);
@@ -95,7 +99,7 @@ void ControlSolenoids(float O2Percent, float CO2Percent, float O2Set, float CO2S
         digitalWrite(SOL_O2, 0);
         digitalWrite(SOL_Ex, 0);
       }
-    }
+    //}
   }
 }
 
@@ -105,7 +109,7 @@ int readings( float *O2Percent, float *CO2Percent, float *Temp, float *Humidity,
   int retval = 1;
   if (O2Serial->available()) {    
     O2Reading = O2Serial->readStringUntil('\n');
-    if(O2Reading.length() < 42){
+    if(O2Reading.length() < 42 && O2Reading.length() > 35){
       *O2Percent = O2Reading.substring(26,32).toFloat();
       *Temp = O2Reading.substring(12,16).toFloat();
       if(Debug) Serial.println("O2:"+O2Reading);

@@ -19,23 +19,23 @@
 #include <stdio.h>
 #include <string.h>
 
-#define Debug 0
+//#define Debug 1
 
 #define SOL_O2 22
 #define SOL_CO2 23
 #define SOL_Ex 24
 
-#define upperO2 25      // upper limit of the O2 sensor
+#define upperO2 21      // upper limit of the O2 sensor
 #define lowerCO2 0      // Lower limit of the CO2 sensor
-#define upperTime 100   // Max time the solenoid can open for at once
-#define lowerTime 10    // Min time for solenoid opening
+#define upperTime 1200   // Max time the solenoid can open for at once
+#define lowerTime 300    // Min time for solenoid opening
 
-#define readTime 3     // Time between sensor readings and solenoids, in seconds
+#define readTime 7 // Time between sensor readings and solenoids, in seconds
 
 float CO2Setpoint = 5.0;
 float O2Setpoint = 5.0;
 
-
+int Debug = 1;
 String inputString;         // a String to hold incoming data
 float Temperature;
 float O2Percent;
@@ -101,7 +101,7 @@ void loop() // run over and over
       Serial.print("\n");
   } 
   if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
-      Serial.println("Offset:");
+      //Serial.println("Offset:");
       goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
   }
 }
