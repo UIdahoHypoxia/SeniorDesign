@@ -34,11 +34,11 @@
 double CO2Setpoint = 5.0;
 double O2Setpoint = 5.0;
 
-double O2Kp=2, O2Ki=5, O2Kd=1;
+double O2Kp=80, O2Ki=5, O2Kd=1;
 
-double CO2Kp=2, CO2Ki=5, CO2Kd=1;
+double CO2Kp=200, CO2Ki=5, CO2Kd=1;
 
-int Debug = 1;
+int Debug = 0;
 String inputString;         // a String to hold incoming data
 float Temperature;
 double O2Percent;

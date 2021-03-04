@@ -69,14 +69,30 @@ void CommandParse(String input){
 
 double ControlO2(double O2Percent, double O2Set, double Kp, double Ki, double Kd){
   static double Output;
-  static PID myPID(&O2Percent, &Output, &O2Set, Kp, Ki, Kd, DIRECT);
+  static double adjustedSetpoint, adjustedO2;
+  adjustedSetpoint = 30 - O2Set;
+  adjustedO2 = 30-O2Percent;
+  static PID myPID(&adjustedO2, &Output, &adjustedSetpoint, Kp, Ki, Kd, DIRECT);
   static int Setup = 0;
+  Serial.print("ControlO2 Params:");
+  Serial.print(O2Percent);
+  Serial.print(", ");
+  Serial.print(O2Set);
+  Serial.print(", ");
+  Serial.print(Kp);
+  Serial.print(", ");
+  Serial.print(Ki);
+  Serial.print(", ");
+  Serial.println(Kd);
   if(!Setup) {
+    Serial.println("O2 PID Setup");
     myPID.SetMode(AUTOMATIC);
     myPID.SetOutputLimits(0, UpperO2Time);
     Setup = 1;
   }
   myPID.Compute();
+  Serial.print("O2 PID Output:");
+  Serial.println(Output);
   digitalWrite(LED_BUILTIN, 1);
   digitalWrite(SOL_Ex, 1);
   digitalWrite(SOL_O2, 1);
@@ -92,6 +108,7 @@ double ControlCO2(double CO2Percent, double CO2Set, double Kp, double Ki, double
   static PID myPID(&CO2Percent, &Output, &CO2Set, Kp, Ki, Kd, DIRECT);
   static int Setup = 0;
   if(!Setup) {
+    Serial.println("CO2 PID Setup");
     myPID.SetMode(AUTOMATIC);
     myPID.SetOutputLimits(0, UpperCO2Time);
     Setup = 1;
