@@ -26,15 +26,15 @@
 #define SOL_CO2 23
 #define SOL_Ex 24
 
-#define UpperO2Time 1200   // Max time the solenoid can open for at once
+#define UpperO2Time 2000   // Max time the solenoid can open for at once
 #define UpperCO2Time 1200
 
 #define readTime 7 // Time between sensor readings and solenoids, in seconds
 
 double CO2Setpoint = 5.0;
-double O2Setpoint = 5.0;
+double O2Setpoint = 1.0;
 
-double O2Kp=80, O2Ki=5, O2Kd=1;
+double O2Kp=140, O2Ki=5, O2Kd=10;
 
 double CO2Kp=200, CO2Ki=5, CO2Kd=1;
 
@@ -86,9 +86,14 @@ void loop() // run over and over
   
   if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
       goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-      O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
+
+      if(O2Percent < 25){
+        O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
+      }
       delay(50);
-      CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
+      /*if(CO2Percent < 10) {
+        CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
+      }*/
       Serial.print(O2Percent);
       Serial.print(",");
       Serial.print(CO2Percent);

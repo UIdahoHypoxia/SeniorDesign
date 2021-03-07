@@ -74,7 +74,7 @@ double ControlO2(double O2Percent, double O2Set, double Kp, double Ki, double Kd
   adjustedO2 = 30-O2Percent;
   static PID myPID(&adjustedO2, &Output, &adjustedSetpoint, Kp, Ki, Kd, DIRECT);
   static int Setup = 0;
-  Serial.print("ControlO2 Params:");
+  /*Serial.print("ControlO2 Params:");
   Serial.print(O2Percent);
   Serial.print(", ");
   Serial.print(O2Set);
@@ -83,7 +83,7 @@ double ControlO2(double O2Percent, double O2Set, double Kp, double Ki, double Kd
   Serial.print(", ");
   Serial.print(Ki);
   Serial.print(", ");
-  Serial.println(Kd);
+  Serial.println(Kd);*/
   if(!Setup) {
     Serial.println("O2 PID Setup");
     myPID.SetMode(AUTOMATIC);
@@ -91,8 +91,8 @@ double ControlO2(double O2Percent, double O2Set, double Kp, double Ki, double Kd
     Setup = 1;
   }
   myPID.Compute();
-  Serial.print("O2 PID Output:");
-  Serial.println(Output);
+  /*Serial.print("O2 PID Output:");
+  Serial.println(Output);*/
   digitalWrite(LED_BUILTIN, 1);
   digitalWrite(SOL_Ex, 1);
   digitalWrite(SOL_O2, 1);
