@@ -20,6 +20,7 @@ title_label.pack()#add the text to the window
 oxyframe = tk.Frame(relief = 'ridge', borderwidth = 5)#makes a container with a border effect
 carbframe = tk.Frame(relief = 'ridge', borderwidth = 5)# makes another container
 current_display_frame = tk.Frame(relief = 'ridge', borderwidth = 5) # make frame for current values
+button_frame = tk.Frame()
 
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen") #label for oxygen input entry
@@ -35,17 +36,39 @@ co2_entry = tk.Entry(master = carbframe)
 co2_entry.pack()
 target_co2 = co2_entry.get()
 
-#Make display values of the current conditions in the chamber
+
+
+####Make display values of the current conditions in the chamber
+#For testing purposes display a random number continuously:
+import random
+#while True:
+#    rand = random.randint(0, 20)
+#    print(rand)
+def random_generation():
+    rand 
+
+conditions_label = tk.Label(master = current_display_frame, text = "Current Conditions")
+conditions_label.pack()
+cond_o2_label = tk.Label(master = current_display_frame, text = "21")
+# Updater function:
+def o2_label_updater():
+    cond_o2_label['text'] = f'{random.randint(0, 20)}'
+
+cond_o2_label.pack()
+    
+o2_label_updater()
 ### insert code that displays current conditions in the chamber (&graphs it possibly)
 
-#Display the frames that were created
-oxyframe.pack() 
-carbframe.pack()
-current_display_frame.pack()
-
 #Make a button to set the target gas values and begin the chamber
-go_button = tk.Button(text="Go!", width = 10, height = 1, relief = "ridge", borderwidth = 5)
+go_button = tk.Button(master = button_frame, text="Go!", width = 10, height = 1, relief = "ridge", borderwidth = 5)
 go_button.pack()
+go_button.bind("<Button-1>")
+
+#Display the frames that were created
+oxyframe.pack(side = "top", anchor = "nw") 
+carbframe.pack(side = "left", anchor = 'nw')
+button_frame.pack(side = 'left', anchor = 'nw')
+current_display_frame.pack(side = 'top', anchor = 'ne', fill = 'both', expand = True)
 
 
 window.mainloop() #this line makes the window appear and function
