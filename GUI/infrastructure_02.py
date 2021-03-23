@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 22 09:14:04 2021
-resource: https://runestone.academy/runestone/books/published/thinkcspy/GUIandEventDrivenProgramming/10_timer_events.html
+https://stackoverflow.com/questions/16059592/tkinter-tclerror-invalid-command-name-4302957584
 @author: izzie-strawn
 """
 ## import modules
@@ -69,7 +69,6 @@ cond_co2_label.grid()
 def display_updater():
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
-    cond_o2_label.after(500, display_updater)
     
 cond_o2_label.after(500, display_updater)
 
