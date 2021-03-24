@@ -4,16 +4,54 @@
 import serial
 import time
 import csv
+import datetime
 
-
+#Modify the Com port to match that of the arduino
 arduino = serial.Serial(port='COM9', baudrate=115200, timeout=.1)
-splitFloat = [0,0]
-fieldnames = ['Time', 'O2', 'CO2', 'Temperature', 'Humidty', 'Pressure', 'O2Solenoid', 'CO2Solenoid']
-def write_read(x):
+#The base declartion of the array for values to be stored into
+#Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
+splitFloat = [0,0,0,0,0,0,0,0]
+#Used to clear and reset splitFloat after each reading
+splitFloatZeros = [0,0,0,0,0,0,0,0]
+
+#The CSV file to save into, eventually changed via the interface
+FileName = 'some.csv'
+
+#Sets the O2 setpoint
+def write_O2(O2):
+    O2 = "O2 " + O2
+    O2 = bytes(O2, 'utf-8')
+    arduino.write(O2)
+    time.sleep(0.02)
+
+#Sets the CO2 Setpoint
+def write_CO2(CO2):
+    CO2 = "CO2 " + CO2
+    CO2 = bytes(CO2, 'utf-8')
+    arduino.write(CO2)
+    time.sleep(0.02)   
+
+#Used to signal door open or closed to pause gasses. Val = 1 Pause, Val = 0 Run
+def write_Door(val):
+    val = "Door " + val
+    val = bytes(val, 'utf-8')
+    arduino.write(val)
+    time.sleep(0.02)
+
+def read_ArduinoLine():
+    splitFloat = [0,0,0,0,0,0,0,0]
+    data = arduino.readline()
+    if data != b'':
+        split = value.split(b',')
+        splitFloat[0] = datetime.datetime.now()
+        for i in range(len(split)):
+            splitFloat[i+1] = float(split[i])
+        return splitFloat
+    
+
+def write_arduino(x):
     arduino.write(bytes(x, 'utf-8'))
     time.sleep(0.05)
-    data = arduino.readline()
-    return data
 
 
 loop = 1
@@ -23,16 +61,18 @@ while loop:
         loop = 0
         arduino.close()
         break
-    value = write_read(num)
-    if value != b'':
-        print(value) # printing the value
-        #print(type(value))
-        split = value.split(b',')
-        #print(split)
-        for i in range(len(split)):
-            splitFloat[i] = float(split[i])
-        with open('some.csv', 'a', newline='') as f:
-            writer = csv.writer(f, delimiter = ',')
-            writer.writerow(splitFloat)
-        #print(float(value))
+    write_arduino(num)
+    splitFloat = read_ArduinoLine()
+    # if value != b'':
+    #     print(value) # printing the value
+    #     #print(type(value))
+    #     split = value.split(b',')
+    #     #print(split)
+    #     splitFloat = splitFloatZeros
+    #     splitFloat[0] = datetime.datetime.now()
+    #     for i in range(len(split)):
+    #         splitFloat[i+1] = float(split[i])
+    with open(FileName, 'a', newline='') as f:
+        writer = csv.writer(f, delimiter = ',')
+        writer.writerow(splitFloat)
 
