@@ -34,9 +34,9 @@
 double CO2Setpoint = 5.0;
 double O2Setpoint = 1.0;
 
-double O2Kp=140, O2Ki=5, O2Kd=10;
+double O2Kp=140, O2Ki=5, O2Kd=0;
 
-double CO2Kp=200, CO2Ki=5, CO2Kd=1;
+double CO2Kp=200, CO2Ki=5, CO2Kd=0;
 
 int Debug = 0;
 String inputString;         // a String to hold incoming data
@@ -54,6 +54,8 @@ int CO2PPM;
 
 HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
+
+int pause = 0;
 
 void setup()
 {
@@ -83,35 +85,36 @@ void loop() // run over and over
   // 0: Bad last reading
   //The goal is to always have read a poor reading in the off cycle and not calculate based on it so that the good reading comes through at the Delay time
   int goodReading = 0; 
+  if(!pause){
+    if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
+        goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
   
-  if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
-      goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
-
-      if(O2Percent < 25){
-        O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
-      }
-      delay(50);
-      /*if(CO2Percent < 10) {
-        CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
-      }*/
-      Serial.print(O2Percent);
-      Serial.print(",");
-      Serial.print(CO2Percent);
-      Serial.print(",");
-      Serial.print(Temp);
-      Serial.print(",");
-      Serial.print(Humidity);
-      Serial.print(",");
-      Serial.print(Pressure);
-      Serial.print(",");
-      Serial.print(O2Solenoid);
-      Serial.print(",");
-      Serial.print(CO2Solenoid);
-      Serial.print("\n");
-  } 
-  if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
-      //Serial.println("Offset:");
-      goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+        if(O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*0.99))){
+          O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
+        }
+        delay(50);
+        if(CO2Percent < 10 && (CO2Percent < (CO2Setpoint*0.98)) ) {
+          CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
+        }
+        Serial.print(O2Percent);
+        Serial.print(",");
+        Serial.print(CO2Percent);
+        Serial.print(",");
+        Serial.print(Temp);
+        Serial.print(",");
+        Serial.print(Humidity);
+        Serial.print(",");
+        Serial.print(Pressure);
+        Serial.print(",");
+        Serial.print(O2Solenoid);
+        Serial.print(",");
+        Serial.print(CO2Solenoid);
+        Serial.print("\n");
+    } 
+    if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
+        //Serial.println("Offset:");
+        goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
+    }
   }
 }
 

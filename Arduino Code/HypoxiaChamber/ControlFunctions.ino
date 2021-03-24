@@ -61,6 +61,9 @@ void CommandParse(String input){
     else if(input.substring(0,5) == "Debug"){
       Debug = (Debug+1)%2;
     }
+    else if(input.substring(0,5) == "Pause") {
+      pause = !pause;
+    }
     else {
        Serial.println(input);
        Serial.println("Invalid Command");
