@@ -4,6 +4,8 @@ Created on Mon Mar 22 09:14:04 2021
 
 @author: izzie-strawn
 """
+#make bounds on target gas values and pressure alarm
+
 ## import modules
 import tkinter as tk
 import random
@@ -15,7 +17,7 @@ window = tk.Tk()
 window.title("Hypoxia Chamber GUI")
 
 ##Place some instruction text at the top of the window
-intro_frame = tk.Frame(relief = 'ridge', borderwidth = 5)
+intro_frame = tk.Frame()
 intro_label = tk.Label(master = intro_frame, text = "Low-Cost Controlable Hypoxia Chamber \n HYPEngineers \n University of Idaho").grid()
 
 
@@ -25,6 +27,7 @@ carbframe = tk.Frame(relief = 'ridge', borderwidth = 5)
 current_display_frame = tk.Frame(relief = 'ridge', borderwidth = 5)
 setbutton_frame = tk.Frame()
 gobutton_frame = tk.Frame()
+errorbox_frame = tk.Frame(relief = 'ridge', borderwidth = 5)
 
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen").grid(row=1, column=0)
@@ -40,12 +43,23 @@ co2_entry.grid()
 setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 10, height = 1, relief = "ridge", borderwidth = 5)
 setvalues_button.grid()
 
+## Make a box to display notifications
+notification_msg = tk.Label(master = errorbox_frame, height = 3, text = 'Any notifications will appear here. Program not running.')
+notification_msg.grid()
+
 # Make the button grab the entered values when clicked
 def entry_graber(event):
-    target_o2 = o2_entry.get() #assigns the input target o2 percentage to a variable
-    target_co2 = co2_entry.get()
-    print(target_o2)
-    print(target_co2)
+    global notification_msg
+    target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
+    target_co2 = float(co2_entry.get())
+    if (target_o2 > 21):
+        notification_msg['text'] = 'Oxygen value too high!'
+    elif (target_co2 > 100):
+        notification_msg['text'] = 'Carbon dioxide value too high!'
+    else:
+        notification_msg['text'] = "Target gas values accepted. Press 'Begin' to start."
+        print(target_o2)
+        print(target_co2)
 
 setvalues_button.bind("<Button-1>", entry_graber)
 
@@ -70,15 +84,18 @@ cond_co2_label.grid()
 def display_updater():
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
-    
-#cond_o2_label.after(5000, display_updater)
 
-##Make a button to begin the hypoxia process (pauses when not pushed - default = paused, pushed = chamber is changing gas composition)
+   # cond_o2_label.after(100, display_updater)
+
+
+###Make a button to begin the hypoxia process (pauses when not pushed - default = paused, pushed = chamber is changing gas composition)
 def toggle_gobutton_appearance():
     if (go_button['text'] == 'Begin'):
         go_button['text'] = 'Machine is running...Press to Pause'
+        notification_msg['text'] = 'Do not forget to pause the program to open the door.'
     else:
         go_button['text'] = 'Begin'
+        notification_msg['text'] = 'Any notifications will appear here. Program not running.'
         
 go_button = tk.Button(master = gobutton_frame, text="Begin", width = 40, height = 1, relief = "ridge", borderwidth = 5, command = toggle_gobutton_appearance)
 go_button.grid()
@@ -88,8 +105,9 @@ intro_frame.grid(columnspan = 2)
 oxyframe.grid(row=1, column=0)
 carbframe.grid(row=2, column=0)
 setbutton_frame.grid(row=3, column=0)
-current_display_frame.grid(row = 1, column = 1)
+current_display_frame.grid(row = 1, column = 1, rowspan = 4)
 gobutton_frame.grid(row = 4)
+errorbox_frame.grid(row = 5, columnspan = 2)
 
 #These lines make the frames adjust when the window size is changed
 window.columnconfigure([0,1], weight=1, minsize=75)
