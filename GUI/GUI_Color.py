@@ -8,7 +8,7 @@ Created on Mon Mar 22 09:14:04 2021
 ## import modules
 import tkinter as tk
 import random
-import pygame
+#import pygame
 
 ## make a window
 window = tk.Tk()
@@ -47,14 +47,14 @@ setvalues_button.grid()
 notification_msg = tk.Label(master = errorbox_frame, height = 3, text = 'Any notifications will appear here. Program not running.', bg="black", fg="gold")
 notification_msg.grid()
 #Initiating the mixer program
-pygame.mixer.init()
+#pygame.mixer.init()
 #Setting up the command to play beep sound
-def play():
-    pygame.mixer.music.load("C:/Users/cmarc/OneDrive/Documents/beep-01a.mp3")
-    pygame.mixer.music.play(1000)  #When the command is used the beep will be played 1000 times
+#def play():
+    #pygame.mixer.music.load("C:/Users/cmarc/OneDrive/Documents/beep-01a.mp3")
+    #pygame.mixer.music.play(1000)  #When the command is used the beep will be played 1000 times
 #Setting up the command to stop the beep
-def stop():
-    pygame.mixer.music.stop()
+#def stop():
+    #pygame.mixer.music.stop()
     
 # Make the button grab the entered values when clicked
 def entry_graber(event):
@@ -65,17 +65,17 @@ def entry_graber(event):
         notification_msg['text'] = 'Oxygen value too high!'
         notification_msg['foreground']="red"
         notification_msg['bg']="black"
-        play()
+        #play()
     elif (target_co2 > 100):
         notification_msg['text'] = 'Carbon dioxide value too high!'
         notification_msg['foreground']="red"
         notification_msg['bg']="black"
-        play()
+        #play()
     else:
         notification_msg['text'] = "Target gas values accepted. Press 'Begin' to start."
         notification_msg['foreground']="green"
         notification_msg['bg']="black"
-        stop()
+        #stop()
         print(target_o2)
         print(target_co2)
 
@@ -98,10 +98,31 @@ cond_co2_name = tk.Label(master = current_display_frame, text = "Current percent
 cond_co2_name.grid()
 cond_co2_label.grid()
 
+#Display the current temperature
+cond_temp_label = tk.Label(master = current_display_frame, text = "-")
+cond_temp_name = tk.Label(master = current_display_frame, text = "Current temperature in Celsius")
+cond_temp_name.grid()
+cond_temp_label.grid()
+
+#Display the current humidity
+cond_humid_label = tk.Label(master = current_display_frame, text = "-")
+cond_humid_name = tk.Label(master = current_display_frame, text = "Current percent relative humidity")
+cond_humid_name.grid()
+cond_humid_label.grid()
+
+#Display the current pressure
+cond_press_label = tk.Label(master = current_display_frame, text = "-")
+cond_press_name = tk.Label(master = current_display_frame, text = "Current pressure in mBar")
+cond_press_name.grid()
+cond_press_label.grid()
+
 #Update the current conditions display (currently it just cycles through random integers)
 def display_updater():
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
+    cond_temp_label['text'] = f'{random.randint(0, 20)}'
+    cond_humid_label['text'] = f'{random.randint(0, 20)}'
+    cond_press_label['text'] = f'{random.randint(0, 20)}'
 
    # cond_o2_label.after(100, display_updater)
 
