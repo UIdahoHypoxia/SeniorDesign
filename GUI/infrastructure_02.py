@@ -4,11 +4,16 @@ Created on Mon Mar 22 09:14:04 2021
 
 @author: izzie-strawn
 """
-#make bounds on target gas values and pressure alarm
+# Start stop experiment and pause/continue experiment
+# type in file name to store data in certain spot
+# make pressure check to alarm when pressure is greater than value (have manual input for atmospheric pressure)
+
 
 ## import modules
 import tkinter as tk
 import random
+
+window = None
 
 ## make a window
 window = tk.Tk()
@@ -47,6 +52,12 @@ setvalues_button.grid()
 notification_msg = tk.Label(master = errorbox_frame, height = 3, text = 'Any notifications will appear here. Program not running.')
 notification_msg.grid()
 
+#Change the notification based on some inputs
+
+#if (pressure > 100):
+#    notification_msg['text'] = 'Warning: Pressure too high. Exercise caution.'
+
+
 # Make the button grab the entered values when clicked
 def entry_graber(event):
     global notification_msg
@@ -82,16 +93,26 @@ cond_co2_label.grid()
 
 #Update the current conditions display (currently it just cycles through random integers)
 def display_updater():
+    global cond_co2_label
+    global cond_o2_label
+    global window
+    #if 'normal' == window.state():
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
 
-   # cond_o2_label.after(100, display_updater)
+    window.after(1000, display_updater)
+    #else:
+     #   pass
 
+#Collect and display data button
+collect_button = tk.Button(master= gobutton_frame, text = 'Press to collect data', command = display_updater)
+collect_button.grid()
+#window.after(1000, display_updater) ## These lines give errors 'invalid command name'. This is because the code tries to run this function and update the widgets after the window is closed. Basically, it is working fine, but there errors are annoying.
 
 ###Make a button to begin the hypoxia process (pauses when not pushed - default = paused, pushed = chamber is changing gas composition)
 def toggle_gobutton_appearance():
     if (go_button['text'] == 'Begin'):
-        go_button['text'] = 'Machine is running...Press to Pause'
+        go_button['text'] = 'Program is running...Press to Pause'
         notification_msg['text'] = 'Do not forget to pause the program to open the door.'
     else:
         go_button['text'] = 'Begin'
