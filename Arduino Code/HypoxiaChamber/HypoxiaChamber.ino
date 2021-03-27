@@ -26,6 +26,8 @@
 #define SOL_CO2 23
 #define SOL_Ex 24
 
+#define O2_Power 10
+
 #define UpperO2Time 2000   // Max time the solenoid can open for at once
 #define UpperCO2Time 1200
 
@@ -56,21 +58,23 @@ HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
 
 int pause = 0;
-
+int O2Errors = 0;
+int O2_OnOff = 1;
 void setup()
 {
    pinMode(SOL_O2, OUTPUT);
    pinMode(SOL_CO2, OUTPUT);
    pinMode(SOL_Ex, OUTPUT);
+   pinMode(O2_Power, OUTPUT);
    pinMode(LED_BUILTIN, OUTPUT);
-   
+   digitalWrite(O2_Power, 1);
   // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Native USB only
   }
-  Serial.println("Serial Connected");
-  Serial.println("O2, CO2, Temp, Humid, Pressure, O2Solenoid, CO2Solenoid");
+  //Serial.println("Serial Connected");
+  //Serial.println("O2, CO2, Temp, Humid, Pressure, O2Solenoid, CO2Solenoid");
 
   // set the data rate for the two Serial ports: Serial1=O2, Serial2=CO2
   O2Serial->begin(9600);
@@ -85,17 +89,36 @@ void loop() // run over and over
   // 0: Bad last reading
   //The goal is to always have read a poor reading in the off cycle and not calculate based on it so that the good reading comes through at the Delay time
   int goodReading = 0; 
+ 
   if(!pause){
     if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
         goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
   
         if(O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*0.99))){
           O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
+          O2Errors = 0;
+        } else if (O2Percent == 100){
+          O2Errors++;
+          Serial.print("O2Errors:");
+          Serial.println(O2Errors);
+
+          Serial.print("O2Power:");
+          Serial.println(O2_OnOff);
+          if(O2Errors > 3 && O2_OnOff == 1){
+            digitalWrite(O2_Power, 0);
+            O2_OnOff = 0;
+            O2Errors = 0;
+          } else if (O2Errors > 3 && O2_OnOff == 0){
+            digitalWrite(O2_Power, 1);
+            O2_OnOff = 1;
+            O2Errors = 0;
+          }
         }
         delay(50);
         if(CO2Percent < 10 && (CO2Percent < (CO2Setpoint*0.98)) ) {
           CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
         }
+        Serial.print("V:");
         Serial.print(O2Percent);
         Serial.print(",");
         Serial.print(CO2Percent);
