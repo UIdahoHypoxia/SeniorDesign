@@ -4,7 +4,7 @@ import csv
 import datetime
 
 #Modify the Com port to match that of the arduino
-arduino = serial.Serial(port='COM7', baudrate=115200, timeout=.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
 #Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
 splitFloat = [0,0,0,0,0,0,0,0]
@@ -75,7 +75,7 @@ while loop:
     #     for i in range(len(split)):
     #         splitFloat[i+1] = float(split[i])
     if(splitFloat[1] != 0):
-        with open(FileName, 'a', newline='') as f:
+        with open(FileName, 'a') as f:
             writer = csv.writer(f, delimiter = ',')
             writer.writerow(splitFloat)
 
