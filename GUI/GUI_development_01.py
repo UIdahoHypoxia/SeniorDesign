@@ -130,11 +130,11 @@ def display_updater():
     global cond_press_label
     global press_entry
     global window
-    cond_o2_label['text'] = f'{random.randint(0, 20)}'
-    cond_co2_label['text'] = f'{random.randint(0, 20)}'
-    cond_temp_label['text'] = f'{random.randint(0, 20)}'
-    cond_humid_label['text'] = f'{random.randint(0, 20)}'
-    cond_press_label['text'] = f'{random.randint(0, 20)}'
+    cond_o2_label['text'] = f'{random.randint(0, 20)}%'
+    cond_co2_label['text'] = f'{random.randint(0, 20)}%'
+    cond_temp_label['text'] = f'{random.randint(0, 20)}°C'
+    cond_humid_label['text'] = f'{random.randint(0, 20)}%'
+    cond_press_label['text'] = f'{random.randint(0, 20)}mBar'
   
     ## Make notification box react to pressure values
     if float(cond_press_label['text']) > float(press_entry.get()):
