@@ -76,9 +76,12 @@ path_entry.grid(row = 1, column = 1)
 submit_button.grid(row = 2)
 
 # Make the button grab the entered values when clicked
-def entry_graber():
+def entry_graber(event):
     global notification_msg
-
+    if setvalues_button['text'] == "Set Values":
+        setvalues_button['text'] = 'Values gathered'
+    else:
+        setvalues_button['text'] = "Set Values"
     target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
     target_co2 = float(co2_entry.get())
     if (target_o2 > 21):
@@ -97,34 +100,14 @@ def entry_graber():
         print(target_co2)
 
 #Make a button to set the target gas values and begin the chamber
-setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 10, height = 1, relief = "ridge", borderwidth = 5, fg="gold",bg="black", command = entry_graber())
+setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 10, height = 1, relief = "ridge", borderwidth = 5, fg="gold",bg="black")
+setvalues_button.bind('<Button-1>', entry_graber)
 setvalues_button.grid()
 
 ## Make a box to display notifications
 notification_msg = tk.Label(master = errorbox_frame, height = 3, text = 'Any notifications will appear here.', bg="black", fg="gold")
 notification_msg.grid()
-'''
-# Make the button grab the entered values when clicked
-def entry_graber():
-    global notification_msg
 
-    target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
-    target_co2 = float(co2_entry.get())
-    if (target_o2 > 21):
-        notification_msg['text'] = 'Oxygen value too high!'
-        notification_msg['foreground']="red"
-        notification_msg['bg']="black"
-    elif (target_co2 > 100):
-        notification_msg['text'] = 'Carbon dioxide value too high!'
-        notification_msg['foreground']="red"
-        notification_msg['bg']="black"
-    else:
-        notification_msg['text'] = "Target gas values accepted. Press 'Begin' to start."
-        notification_msg['foreground']="green"
-        notification_msg['bg']="black"
-        print(target_o2)
-        print(target_co2)
-'''
 ####Make display values of the current conditions in the chamber
 conditions_label = tk.Label(master = current_display_frame, text = "Current Conditions", font = (1), fg="gold",bg="black")
 conditions_label.grid()
@@ -176,7 +159,8 @@ def display_updater():
   
     window.after(10000, display_updater)
 
-window.after(10000, display_updater)
+display_updater()
+#window.after(10000, display_updater)
 '''
 ## Make notification box react to pressure values
 def pressure_compare():
@@ -236,6 +220,16 @@ errorbox_frame.grid(row = 6, columnspan = 2)
 #These lines make the frames adjust when the window size is changed
 window.columnconfigure([0,1], weight=1, minsize=75)
 window.rowconfigure([0,1,2,3], weight=1, minsize=50)
+
+from tkinter import messagebox
+# Define what will happen when the window is closed.
+def on_closing():
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+       # window.after_cancel(display_updater)
+        window.quit()
+       # window.destroy()
+
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
 #Run the window for viewing
 window.mainloop()
