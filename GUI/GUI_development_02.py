@@ -4,9 +4,11 @@ Created on Mon Mar 22 09:14:04 2021
 @authors: izzie strawn, colin marchus, jacob knudson
 
 Progress notes:
-*Still need to figure out how to stop displaying error message.
 *Error with pressure calibration - need to set it to not collect input until button is pushed.
 *Idea: Make a seperate button to set the pressure value and compare that data
+*Make conditions not update until begin button pressed
+*Adjust button labels - Begin button: press to stop experiment
+*Adjust layout of the set values button
 
 """
 
@@ -14,6 +16,7 @@ Progress notes:
 import tkinter as tk
 import random
 from tkinter import filedialog
+from tkinter import messagebox
 
 ## make a window
 window = tk.Tk()
@@ -52,6 +55,7 @@ co2_entry.grid()
 press_label = tk.Label(master =pressframe, text = "Pressure Calibration", fg="gold",bg="black").grid()
 press_entry = tk.Entry(master = pressframe)
 press_entry.grid()
+
 
 ## Make a place to input a file path
 pathlabel = tk.Label(master = fileframe, text = 'Insert file path')
@@ -151,17 +155,20 @@ def display_updater():
     global cond_press_label
     global press_entry
     global window
+    global after_ID
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
     cond_temp_label['text'] = f'{random.randint(0, 20)}'
     cond_humid_label['text'] = f'{random.randint(0, 20)}'
     cond_press_label['text'] = f'{random.randint(0, 20)}'
-  
-    window.after(10000, display_updater)
+    after_ID = window.after(10000, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
+    after_ID
+
 
 display_updater()
-#window.after(10000, display_updater)
-'''
+
+
+
 ## Make notification box react to pressure values
 def pressure_compare():
     global notification_msg
@@ -174,7 +181,11 @@ def pressure_compare():
         notification_msg['text'] = 'Any notifications will appear here.'
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
-'''
+
+# Make a button to set pressure calibration
+press_button = tk.Button(master = pressframe, text = 'Set Base Pressure', command = pressure_compare)
+press_button.grid()
+
 ###Make a button to begin the hypoxia process (an experiment)
 def toggle_gobutton_appearance():
     if (go_button['text'] == 'Begin Experiment'):
@@ -221,13 +232,11 @@ errorbox_frame.grid(row = 6, columnspan = 2)
 window.columnconfigure([0,1], weight=1, minsize=75)
 window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 
-from tkinter import messagebox
 # Define what will happen when the window is closed.
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
-       # window.after_cancel(display_updater)
-        window.quit()
-       # window.destroy()
+        window.after_cancel(after_ID)
+        window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
 
