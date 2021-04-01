@@ -1,13 +1,10 @@
-
-
-
 import serial
 import time
 import csv
 import datetime
 
 #Modify the Com port to match that of the arduino
-arduino = serial.Serial(port='COM9', baudrate=115200, timeout=.1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
 #Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
 splitFloat = [0,0,0,0,0,0,0,0]
@@ -42,11 +39,16 @@ def read_ArduinoLine():
     splitFloat = [0,0,0,0,0,0,0,0]
     data = arduino.readline()
     if data != b'':
-        split = value.split(b',')
-        splitFloat[0] = datetime.datetime.now()
-        for i in range(len(split)):
-            splitFloat[i+1] = float(split[i])
-        return splitFloat
+        print(data)
+        strData = data.decode("utf-8")
+        if(strData[0:2] == "V:"):
+            split = strData[2:].split(",")
+            splitFloat[0] = datetime.datetime.now()
+            for i in range(len(split)):
+                splitFloat[i+1] = float(split[i])
+            print(splitFloat)
+        
+    return splitFloat, data
     
 
 def write_arduino(x):
@@ -56,13 +58,13 @@ def write_arduino(x):
 
 loop = 1
 while loop:
-    num = input("Enter a number: ") # Taking input from user
-    if num == 'stop':
-        loop = 0
-        arduino.close()
-        break
-    write_arduino(num)
-    splitFloat = read_ArduinoLine()
+    # num = input("Enter a number: ") # Taking input from user
+    # if num == 'stop':
+    #     loop = 0
+    #     arduino.close()
+    #     break
+    #write_arduino(num)
+    splitFloat, data = read_ArduinoLine()
     # if value != b'':
     #     print(value) # printing the value
     #     #print(type(value))
@@ -72,7 +74,8 @@ while loop:
     #     splitFloat[0] = datetime.datetime.now()
     #     for i in range(len(split)):
     #         splitFloat[i+1] = float(split[i])
-    with open(FileName, 'a', newline='') as f:
-        writer = csv.writer(f, delimiter = ',')
-        writer.writerow(splitFloat)
+    if(splitFloat[1] != 0):
+        with open(FileName, 'a') as f:
+            writer = csv.writer(f, delimiter = ',')
+            writer.writerow(splitFloat)
 
