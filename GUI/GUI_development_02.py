@@ -6,8 +6,7 @@ Created on Mon Mar 22 09:14:04 2021
 Progress notes:
 *Error with pressure calibration - need to set it to not collect input until button is pushed.
 *Idea: Make a seperate button to set the pressure value and compare that data
-*Make conditions not update until begin button pressed
-*Adjust button labels -  press to do this - make all buttons change when pressed
+*Make conditions not update until begin button pressed - accomplished with a few bugs
 *Why does setvalues_button need to be pressed twice? something is wrong...
 
 """
