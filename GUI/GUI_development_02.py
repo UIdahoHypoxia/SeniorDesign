@@ -7,8 +7,8 @@ Progress notes:
 *Error with pressure calibration - need to set it to not collect input until button is pushed.
 *Idea: Make a seperate button to set the pressure value and compare that data
 *Make conditions not update until begin button pressed
-*Adjust button labels - Begin button: press to stop experiment
-*Adjust layout of the set values button
+*Adjust button labels -  press to do this - make all buttons change when pressed
+*Why does setvalues_button need to be pressed twice? something is wrong...
 
 """
 
@@ -37,9 +37,20 @@ carbframe = tk.Frame(master = Target_frame, relief = 'ridge', borderwidth = 5, b
 pressframe = tk.Frame(master = Target_frame, relief = 'ridge', borderwidth = 5, bg="black")
 fileframe = tk.Frame(master = Target_frame, relief = 'ridge', borderwidth = 5, bg="black")
 current_display_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
-setbutton_frame = tk.Frame()
+setbutton_frame = tk.Frame(master = Target_frame)
 gobutton_frame = tk.Frame()
 errorbox_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
+
+# Make a function combiner so that a button can perform multiple commands:
+def combineFunc(*funcs):
+       def combinedFunc(*args, **kwargs):
+            for f in funcs:
+                f(*args, **kwargs)
+       return combinedFunc
+
+#Make a title for the input frame
+target_title = tk.Label(master = Target_frame, text = 'Input Target Values')
+target_title.grid()
 
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen", fg="gold",bg="black").grid(row=1, column=0)
@@ -79,32 +90,44 @@ browsebutton.grid(row = 1, column = 0)
 path_entry.grid(row = 1, column = 1)
 submit_button.grid(row = 2)
 
+# Make a label to display the accepted target values
+o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'%')
+o2_accepted.grid()
+co2_accepted = tk.Label(master = carbframe, text = 'Current Target Value:'+'-'+'%')
+co2_accepted.grid()
+
 # Make the button grab the entered values when clicked
 def entry_graber(event):
     global notification_msg
+    global setvalues_button
+    global o2_entry
+    global co2_entry
+    global o2_accepted
     if setvalues_button['text'] == "Set Values":
         setvalues_button['text'] = 'Values gathered'
+        target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
+        target_co2 = float(co2_entry.get())
+        if (target_o2 > 21):
+            notification_msg['text'] = 'Oxygen value too high!'
+            notification_msg['foreground']="red"
+            notification_msg['bg']="black"
+        elif (target_co2 > 100):
+            notification_msg['text'] = 'Carbon dioxide value too high!'
+            notification_msg['foreground']="red"
+            notification_msg['bg']="black"
+        else:
+            notification_msg['text'] = "Target gas values accepted. Press 'Begin Experiment' to start."
+            notification_msg['foreground']="green"
+            notification_msg['bg']="black"
+            o2_accepted['text'] = ('Current Target Value: '+ o2_entry.get() +'%')
+            co2_accepted['text'] = ('Current Target Value: '+ co2_entry.get() +'%')
+            print(target_o2)
+            print(target_co2)
     else:
         setvalues_button['text'] = "Set Values"
-    target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
-    target_co2 = float(co2_entry.get())
-    if (target_o2 > 21):
-        notification_msg['text'] = 'Oxygen value too high!'
-        notification_msg['foreground']="red"
-        notification_msg['bg']="black"
-    elif (target_co2 > 100):
-        notification_msg['text'] = 'Carbon dioxide value too high!'
-        notification_msg['foreground']="red"
-        notification_msg['bg']="black"
-    else:
-        notification_msg['text'] = "Target gas values accepted. Press 'Begin' to start."
-        notification_msg['foreground']="green"
-        notification_msg['bg']="black"
-        print(target_o2)
-        print(target_co2)
 
 #Make a button to set the target gas values and begin the chamber
-setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 10, height = 1, relief = "ridge", borderwidth = 5, fg="gold",bg="black")
+setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="gold",bg="black")
 setvalues_button.bind('<Button-1>', entry_graber)
 setvalues_button.grid()
 
@@ -165,7 +188,7 @@ def display_updater():
     after_ID
 
 
-display_updater()
+#display_updater()
 
 
 
@@ -189,7 +212,7 @@ press_button.grid()
 ###Make a button to begin the hypoxia process (an experiment)
 def toggle_gobutton_appearance():
     if (go_button['text'] == 'Begin Experiment'):
-        go_button['text'] = 'Experiment in progress...program is running.'
+        go_button['text'] = 'Experiment in progress...program is running. \n Press to end Experiment.'
         go_button['background']="red"
         notification_msg['text'] = 'Do not forget to pause the program to open the door.'
         notification_msg['foreground']="gold"
@@ -200,13 +223,13 @@ def toggle_gobutton_appearance():
         go_button['background']="green"
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
-go_button = tk.Button(master = gobutton_frame, text="Begin Experiment", background=("green"), width = 40, height = 1, relief = "ridge", borderwidth = 5, command = toggle_gobutton_appearance)
+go_button = tk.Button(master = gobutton_frame, text="Begin Experiment", background=("green"), width = 40, height = 2, relief = "ridge", borderwidth = 5, command = combineFunc(toggle_gobutton_appearance, display_updater))
 go_button.grid()
 
 #Make a button to pause and un-pause the hypoxia process (an experiment)
 def toggle_pausebutton_appearance():
     if (pause_button['text'] == "Pause Experiment"):
-        pause_button['text'] = 'Experiment paused'
+        pause_button['text'] = 'Experiment paused. Press to resume.'
         notification_msg['text'] = 'Program is paused. Door may be opened.'
     else:
         pause_button['text'] = "Pause Experiment"
@@ -223,7 +246,7 @@ oxyframe.grid()
 carbframe.grid()
 pressframe.grid()
 fileframe.grid()
-setbutton_frame.grid(row=4, column=0)
+setbutton_frame.grid()
 current_display_frame.grid(row = 1, column = 1, rowspan = 4)
 gobutton_frame.grid(row = 5)
 errorbox_frame.grid(row = 6, columnspan = 2)
@@ -235,7 +258,7 @@ window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 # Define what will happen when the window is closed.
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        window.after_cancel(after_ID)
+        window.after_cancel(display_updater)
         window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
