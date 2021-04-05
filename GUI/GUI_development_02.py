@@ -183,29 +183,56 @@ def display_updater():
     cond_temp_label['text'] = f'{random.randint(0, 20)}'
     cond_humid_label['text'] = f'{random.randint(0, 20)}'
     cond_press_label['text'] = f'{random.randint(0, 20)}'
-    after_ID = window.after(10000, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
-    after_ID
+    try:
+        after_ID = window.after(10000, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
+        after_ID
+    except:
+        pass
 
 
 #display_updater()
-
-
-
+'''
 ## Make notification box react to pressure values
 def pressure_compare():
     global notification_msg
     global cond_press_label
-    if float(cond_press_label['text']) > float(press_entry.get()):
-        notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
-        notification_msg['foreground']="red"
+    try:
+        if float(cond_press_label['text']) > float(press_entry.get()):
+            notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
+            notification_msg['foreground']="red"
+            notification_msg['bg']="black"
+        else:
+            notification_msg['text'] = 'Any notifications will appear here.'
+            notification_msg['foreground']="gold"
+            notification_msg['bg']="black"
+    except:
+        notification_msg['text'] = 'Please input pressure calibration'
+        notification_msg['foreground']="gold"
         notification_msg['bg']="black"
-    else:
-        notification_msg['text'] = 'Any notifications will appear here.'
+'''
+def toggle_press_button_appearance():
+    global notification_msg
+    global cond_press_label
+    try:
+        if (press_button['text'] == 'Set Base Pressure'):
+            press_button['text'] = ('Base Pressure set to' + press_entry.get() + 'mBar')
+            if float(cond_press_label['text']) > float(press_entry.get()):
+                notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
+                notification_msg['foreground']="red"
+                notification_msg['bg']="black"
+            else:
+                notification_msg['text'] = 'Any notifications will appear here.'
+                notification_msg['foreground']="gold"
+                notification_msg['bg']="black"
+        else:
+            press_button['text'] = 'Set Base Pressure'
+    except:
+        notification_msg['text'] = 'Please input pressure calibration'
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
 
 # Make a button to set pressure calibration
-press_button = tk.Button(master = pressframe, text = 'Set Base Pressure', command = pressure_compare)
+press_button = tk.Button(master = pressframe, text = 'Set Base Pressure', command = toggle_press_button_appearance)
 press_button.grid()
 
 ###Make a button to begin the hypoxia process (an experiment)
@@ -222,7 +249,8 @@ def toggle_gobutton_appearance():
         go_button['background']="green"
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
-go_button = tk.Button(master = gobutton_frame, text="Begin Experiment", background=("green"), width = 40, height = 2, relief = "ridge", borderwidth = 5, command = combineFunc(toggle_gobutton_appearance, display_updater))
+        
+go_button = tk.Button(master = gobutton_frame, text="Begin Experiment", background=("green"), width = 40, height = 2, relief = "ridge", borderwidth = 5, command = lambda:[toggle_gobutton_appearance(), display_updater()])
 go_button.grid()
 
 #Make a button to pause and un-pause the hypoxia process (an experiment)
@@ -257,7 +285,10 @@ window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 # Define what will happen when the window is closed.
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        window.after_cancel(display_updater)
+        #try:
+         #   window.after_cancel(after_ID)
+        #except:
+         #   window.after_cancel(display_updater)
         window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
