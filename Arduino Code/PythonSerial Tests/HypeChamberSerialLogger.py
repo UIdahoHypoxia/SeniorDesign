@@ -65,6 +65,11 @@ while loop:
     #     break
     #write_arduino(num)
     splitFloat, data = read_ArduinoLine()
+    pressure = splitFloat[5]
+    if(pressure >= pressureLimit*0.95):
+        print("Pressure Warning")
+    elif(pressure >= pressureLimit):
+        write_Door(1)
     # if value != b'':
     #     print(value) # printing the value
     #     #print(type(value))
