@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 22 09:14:04 2021
-@authors: izzie strawn, colin marchus, jacob knudson
+@authors: Izzie Strawn, Colin Marchus, Jacob Knudson, Andrew Hartman, Alex Morrison
 
 Progress notes:
-*Error with pressure calibration - need to set it to not collect input until button is pushed.
-*Idea: Make a seperate button to set the pressure value and compare that data
-*Make conditions not update until begin button pressed - accomplished with a few bugs
 *Why does setvalues_button need to be pressed twice? something is wrong...
 
 """
@@ -48,7 +45,7 @@ def combineFunc(*funcs):
        return combinedFunc
 
 #Make a title for the input frame
-target_title = tk.Label(master = Target_frame, text = 'Input Target Values')
+target_title = tk.Label(master = Target_frame, text = 'Input Target Values', font = (1), fg="gold",bg="black")
 target_title.grid()
 
 #Make a place to input the oxygen percentage
@@ -68,8 +65,8 @@ press_entry.grid()
 
 
 ## Make a place to input a file path
-pathlabel = tk.Label(master = fileframe, text = 'Insert file path')
-path_entry = tk.Entry(master = fileframe)
+pathlabel = tk.Label(master = fileframe, text = 'Insert file path to save data to:', fg="gold",bg="black")
+path_entry = tk.Entry(master = fileframe, width = 50)
 
 def browsefunc():
     filename = filedialog.askopenfilename()
@@ -87,12 +84,12 @@ submit_button = tk.Button(master = fileframe, text = 'Submit file path', command
 pathlabel.grid(columnspan =3)
 browsebutton.grid(row = 1, column = 0)
 path_entry.grid(row = 1, column = 1)
-submit_button.grid(row = 2)
+submit_button.grid(row = 2, columnspan=2)
 
 # Make a label to display the accepted target values
-o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'%')
+o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'%', fg="gold",bg="black")
 o2_accepted.grid()
-co2_accepted = tk.Label(master = carbframe, text = 'Current Target Value:'+'-'+'%')
+co2_accepted = tk.Label(master = carbframe, text = 'Current Target Value:'+'-'+'%', fg="gold",bg="black")
 co2_accepted.grid()
 
 # Make the button grab the entered values when clicked
@@ -178,29 +175,13 @@ def display_updater():
     global press_entry
     global window
     global after_ID
+    global cond_press_label
     cond_o2_label['text'] = f'{random.randint(0, 20)}'
     cond_co2_label['text'] = f'{random.randint(0, 20)}'
     cond_temp_label['text'] = f'{random.randint(0, 20)}'
     cond_humid_label['text'] = f'{random.randint(0, 20)}'
     cond_press_label['text'] = f'{random.randint(0, 20)}'
     if(go_button['text'] == 'Experiment in progress...program is running. \n Press to end Experiment.'):
-        try:
-            after_ID = window.after(100, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
-            after_ID
-        except:
-            pass
-    else:
-        window.after_cancel(after_ID)
-
-
-
-#display_updater()
-'''
-## Make notification box react to pressure values
-def pressure_compare():
-    global notification_msg
-    global cond_press_label
-    try:
         if float(cond_press_label['text']) > float(press_entry.get()):
             notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
             notification_msg['foreground']="red"
@@ -209,35 +190,14 @@ def pressure_compare():
             notification_msg['text'] = 'Any notifications will appear here.'
             notification_msg['foreground']="gold"
             notification_msg['bg']="black"
-    except:
-        notification_msg['text'] = 'Please input pressure calibration'
-        notification_msg['foreground']="gold"
-        notification_msg['bg']="black"
-'''
-def toggle_press_button_appearance():
-    global notification_msg
-    global cond_press_label
-    try:
-        if (press_button['text'] == 'Set Base Pressure'):
-            press_button['text'] = ('Base Pressure set to' + press_entry.get() + 'mBar')
-            if float(cond_press_label['text']) > float(press_entry.get()):
-                notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
-                notification_msg['foreground']="red"
-                notification_msg['bg']="black"
-            else:
-                notification_msg['text'] = 'Any notifications will appear here.'
-                notification_msg['foreground']="gold"
-                notification_msg['bg']="black"
-        else:
-            press_button['text'] = 'Set Base Pressure'
-    except:
-        notification_msg['text'] = 'Please input pressure calibration'
-        notification_msg['foreground']="gold"
-        notification_msg['bg']="black"
+        try:
+            after_ID = window.after(1000, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
+            after_ID
+        except:
+            pass
+    else:
+        window.after_cancel(after_ID)
 
-# Make a button to set pressure calibration
-press_button = tk.Button(master = pressframe, text = 'Set Base Pressure', command = toggle_press_button_appearance)
-press_button.grid()
 
 ###Make a button to begin the hypoxia process (an experiment)
 def toggle_gobutton_appearance():
@@ -277,8 +237,8 @@ Target_frame.grid(row = 1, column = 0)
 oxyframe.grid()
 carbframe.grid()
 pressframe.grid()
-fileframe.grid()
 setbutton_frame.grid()
+fileframe.grid()
 current_display_frame.grid(row = 1, column = 1, rowspan = 4)
 gobutton_frame.grid(row = 5)
 errorbox_frame.grid(row = 6, columnspan = 2)
@@ -289,11 +249,7 @@ window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 
 # Define what will happen when the window is closed.
 def on_closing():
-    if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        #try:
-         #   window.after_cancel(after_ID)
-        #except:
-         #   window.after_cancel(display_updater)
+    if messagebox.askokcancel("Quit", "Do you want to quit? \n (Be sure to stop experiments before quitting!)"):
         window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
