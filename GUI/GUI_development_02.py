@@ -289,6 +289,7 @@ def on_closing():
          #   window.after_cancel(after_ID)
         #except:
          #   window.after_cancel(display_updater)
+        window.quit()
         window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)

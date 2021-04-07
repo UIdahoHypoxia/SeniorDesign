@@ -46,7 +46,7 @@ def combineFunc(*funcs):
 
 #Make a title for the input frame
 target_title = tk.Label(master = Target_frame, text = 'Input Target Values', font = (1), fg="gold",bg="black")
-target_title.grid()
+target_title.grid(row = 0, columnspan = 2)
 
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen", fg="gold",bg="black").grid(row=1, column=0)
@@ -91,6 +91,8 @@ o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'
 o2_accepted.grid()
 co2_accepted = tk.Label(master = carbframe, text = 'Current Target Value:'+'-'+'%', fg="gold",bg="black")
 co2_accepted.grid()
+press_accepted = tk.Label(master = pressframe, text = 'Current Target Value:'+'-'+'mBar', fg="gold",bg="black")
+press_accepted.grid()
 
 # Make the button grab the entered values when clicked
 def entry_graber(event):
@@ -99,6 +101,8 @@ def entry_graber(event):
     global o2_entry
     global co2_entry
     global o2_accepted
+    global co2_accepted
+    global press_accepted
     if setvalues_button['text'] == "Set Values":
         setvalues_button['text'] = 'Values gathered'
         target_o2 = float(o2_entry.get()) #assigns the input target o2 percentage to a variable
@@ -117,13 +121,14 @@ def entry_graber(event):
             notification_msg['bg']="black"
             o2_accepted['text'] = ('Current Target Value: '+ o2_entry.get() +'%')
             co2_accepted['text'] = ('Current Target Value: '+ co2_entry.get() +'%')
+            press_accepted['text'] = ('Current Target Value: '+ press_entry.get() +'mBar')
             print(target_o2)
             print(target_co2)
     else:
         setvalues_button['text'] = "Set Values"
 
 #Make a button to set the target gas values and begin the chamber
-setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="gold",bg="black")
+setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="black")
 setvalues_button.bind('<Button-1>', entry_graber)
 setvalues_button.grid()
 
@@ -234,14 +239,14 @@ pause_button.grid()
 
 intro_frame.grid(columnspan = 2)
 Target_frame.grid(row = 1, column = 0)
-oxyframe.grid()
-carbframe.grid()
+oxyframe.grid(row = 1, column =0)
+carbframe.grid(row =1, column =1)
 pressframe.grid()
-setbutton_frame.grid()
-fileframe.grid()
+setbutton_frame.grid(row = 2, column =1)
+fileframe.grid(columnspan = 2)
 current_display_frame.grid(row = 1, column = 1, rowspan = 4)
-gobutton_frame.grid(row = 5)
-errorbox_frame.grid(row = 6, columnspan = 2)
+gobutton_frame.grid(row = 2)
+errorbox_frame.grid(row = 3, columnspan = 2)
 
 #These lines make the frames adjust when the window size is changed
 window.columnconfigure([0,1], weight=1, minsize=75)
