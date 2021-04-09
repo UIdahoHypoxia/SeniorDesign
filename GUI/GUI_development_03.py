@@ -46,22 +46,22 @@ def combineFunc(*funcs):
 
 #Make a title for the input frame
 target_title = tk.Label(master = Target_frame, text = 'Input Target Values', font = (1), fg="gold",bg="black")
-target_title.grid(row = 0, columnspan = 2)
+target_title.grid(row = 0, columnspan = 2, padx=5, pady=5)
 
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen", fg="gold",bg="black").grid(row=1, column=0)
 o2_entry = tk.Entry(master = oxyframe)
-o2_entry.grid(row=2, column = 0) #create a textbox where the percent oxygen can be input
+o2_entry.grid(row=2, column = 0, padx=5, pady=5) #create a textbox where the percent oxygen can be input
 
 #Make a place to input the CO2 percentage
 co2_label = tk.Label(master = carbframe, text = "Percent Carbon Dioxide", fg="gold",bg="black").grid() # label for co2 input entry
 co2_entry = tk.Entry(master = carbframe)
-co2_entry.grid()
+co2_entry.grid( padx=5, pady=5)
 
 # Make a place to inut pressure calibration step
 press_label = tk.Label(master =pressframe, text = "Pressure Calibration", fg="gold",bg="black").grid()
 press_entry = tk.Entry(master = pressframe)
-press_entry.grid()
+press_entry.grid( padx=5, pady=5)
 
 
 ## Make a place to input a file path
@@ -72,27 +72,27 @@ def browsefunc():
     filename = filedialog.askopenfilename()
     path_entry.insert(0, filename)
     
-browsebutton = tk.Button(master = fileframe, text="Browse", command=browsefunc)
+browsebutton = tk.Button(master = fileframe, text="Browse", background = ('silver'), command=browsefunc)
 
 # Grab File path
 def path_graber():
     path_text = path_entry.get()
     print(path_text)
 
-submit_button = tk.Button(master = fileframe, text = 'Submit file path', command = path_graber)
+submit_button = tk.Button(master = fileframe, text = 'Submit file path', background = ('silver'), command = path_graber)
 
-pathlabel.grid(columnspan =3)
-browsebutton.grid(row = 1, column = 0)
-path_entry.grid(row = 1, column = 1)
-submit_button.grid(row = 2, columnspan=2)
+pathlabel.grid(columnspan =3, padx=5, pady=5)
+browsebutton.grid(row = 1, column = 0, padx=5, pady=5)
+path_entry.grid(row = 1, column = 1, padx=5, pady=5)
+submit_button.grid(row = 2, columnspan=2, padx=5, pady=5)
 
 # Make a label to display the accepted target values
 o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'%', fg="gold",bg="black")
-o2_accepted.grid()
+o2_accepted.grid(padx=5, pady=5)
 co2_accepted = tk.Label(master = carbframe, text = 'Current Target Value:'+'-'+'%', fg="gold",bg="black")
-co2_accepted.grid()
+co2_accepted.grid(padx=5, pady=5)
 press_accepted = tk.Label(master = pressframe, text = 'Current Target Value:'+'-'+'mBar', fg="gold",bg="black")
-press_accepted.grid()
+press_accepted.grid(padx=5, pady=5)
 
 # Make the button grab the entered values when clicked
 def entry_graber(event):
@@ -128,47 +128,47 @@ def entry_graber(event):
         setvalues_button['text'] = "Set Values"
 
 #Make a button to set the target gas values and begin the chamber
-setvalues_button = tk.Button(master = setbutton_frame, text="Set values", width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="black")
+setvalues_button = tk.Button(master = setbutton_frame, text="Set values", background = ('silver'), width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="black")
 setvalues_button.bind('<Button-1>', entry_graber)
 setvalues_button.grid()
 
 ## Make a box to display notifications
 notification_msg = tk.Label(master = errorbox_frame, height = 3, text = 'Any notifications will appear here.', bg="black", fg="gold")
-notification_msg.grid()
+notification_msg.grid(padx=5, pady=5)
 
 ####Make display values of the current conditions in the chamber
 conditions_label = tk.Label(master = current_display_frame, text = "Current Conditions", font = (1), fg="gold",bg="black")
-conditions_label.grid()
+conditions_label.grid(padx=5, pady=5)
 
 #Display the current o2 values
 cond_o2_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_o2_name = tk.Label(master = current_display_frame, text = "Current percent oxygen", fg="gold",bg="black")
-cond_o2_name.grid()
-cond_o2_label.grid()
+cond_o2_name.grid(padx=5, pady=5)
+cond_o2_label.grid(padx=5, pady=5)
 
 #Display the current co2 values
 cond_co2_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_co2_name = tk.Label(master = current_display_frame, text = "Current percent carbon dioxide", fg="gold",bg="black")
-cond_co2_name.grid()
-cond_co2_label.grid()
+cond_co2_name.grid(padx=5, pady=5)
+cond_co2_label.grid(padx=5, pady=5)
 
 #Display the current temperature
 cond_temp_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_temp_name = tk.Label(master = current_display_frame, text = "Current temperature in Celsius", fg="gold",bg="black")
-cond_temp_name.grid()
-cond_temp_label.grid()
+cond_temp_name.grid(padx=5, pady=5)
+cond_temp_label.grid(padx=5, pady=5)
 
 #Display the current humidity
 cond_humid_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_humid_name = tk.Label(master = current_display_frame, text = "Current percent relative humidity", fg="gold",bg="black")
-cond_humid_name.grid()
-cond_humid_label.grid()
+cond_humid_name.grid(padx=5, pady=5)
+cond_humid_label.grid(padx=5, pady=5)
 
 #Display the current pressure
 cond_press_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_press_name = tk.Label(master = current_display_frame, text = "Current pressure in mBar", fg="gold",bg="black")
-cond_press_name.grid()
-cond_press_label.grid()
+cond_press_name.grid(padx=5, pady=5)
+cond_press_label.grid(padx=5, pady=5)
 
 #Update the current conditions display (currently it just cycles through random integers)
 def display_updater():
@@ -232,21 +232,21 @@ def toggle_pausebutton_appearance():
         pause_button['text'] = "Pause Experiment"
         notification_msg['text'] = 'Do not forget to pause the program to open the door.'
 
-pause_button = tk.Button(master = gobutton_frame, text = "Pause Experiment", background = ('gold'), width = 40, height = 1, relief = 'ridge', borderwidth = 5, command = toggle_pausebutton_appearance)
+pause_button = tk.Button(master = gobutton_frame, text = "Pause Experiment", background = ('silver'), width = 40, height = 1, relief = 'ridge', borderwidth = 5, command = toggle_pausebutton_appearance)
 pause_button.grid()    
 
 #Display the frames
 
-intro_frame.grid(columnspan = 2)
-Target_frame.grid(row = 1, column = 0)
-oxyframe.grid(row = 1, column =0)
-carbframe.grid(row =1, column =1)
-pressframe.grid()
-setbutton_frame.grid(row = 2, column =1)
-fileframe.grid(columnspan = 2)
-current_display_frame.grid(row = 1, column = 1, rowspan = 4)
-gobutton_frame.grid(row = 2)
-errorbox_frame.grid(row = 3, columnspan = 2)
+intro_frame.grid(columnspan = 2, padx=3, pady=3)
+Target_frame.grid(row = 1, column = 0, padx=3, pady=3)
+oxyframe.grid(row = 1, column =0, padx=3, pady=3)
+carbframe.grid(row =1, column =1, padx=3, pady=3)
+pressframe.grid(padx=3, pady=3)
+setbutton_frame.grid(row = 2, column =1, padx=3, pady=3)
+fileframe.grid(columnspan = 2, padx=3, pady=3)
+current_display_frame.grid(row = 0, column = 1, rowspan = 4, padx=3, pady=3)
+gobutton_frame.grid(row = 2, padx=3, pady=3)
+errorbox_frame.grid(row = 3, columnspan = 2, padx=3, pady=3)
 
 #These lines make the frames adjust when the window size is changed
 window.columnconfigure([0,1], weight=1, minsize=75)
