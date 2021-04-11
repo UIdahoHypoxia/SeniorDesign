@@ -52,19 +52,28 @@ void CommandParse(String input){
       O2Setpoint = input.substring(3).toFloat();
     }
     else if(input.substring(0,3) == "CO2") {
-      CO2Serial->print(input.substring(4));
+      CO2Setpoint = input.substring(4).toFloat();
+      Serial.println(CO2Setpoint);
+      /*CO2Serial->print(input.substring(4));
       if (CO2Serial->available()) {
         CO2Reading = CO2Serial->readStringUntil('\n');
         Serial.println("CO2 Command Return" + CO2Reading);
-      }
+      }*/
     }
     else if(input.substring(0,5) == "Debug"){
       Debug = (Debug+1)%2;
     }
     else if(input.substring(0,5) == "Pause") {
       pause = !pause;
+    } 
+    else if(input.substring(0,5) == "Start") {
+      GO = 1;
+    }
+    else if(input.substring(0,4) == "Stop") {
+      GO = 0;
     }
     else {
+       digitalWrite(LED_BUILTIN, HIGH);
        Serial.println(input);
        Serial.println("Invalid Command");
     }
@@ -96,11 +105,11 @@ double ControlO2(double O2Percent, double O2Set, double Kp, double Ki, double Kd
   myPID.Compute();
   /*Serial.print("O2 PID Output:");
   Serial.println(Output);*/
-  digitalWrite(LED_BUILTIN, 1);
+  //digitalWrite(LED_BUILTIN, 1);
   digitalWrite(SOL_Ex, 1);
   digitalWrite(SOL_O2, 1);
   delay(Output);
-  digitalWrite(LED_BUILTIN, 0);
+  //digitalWrite(LED_BUILTIN, 0);
   digitalWrite(SOL_O2, 0);
   digitalWrite(SOL_Ex, 0);
   return Output;
@@ -117,11 +126,11 @@ double ControlCO2(double CO2Percent, double CO2Set, double Kp, double Ki, double
     Setup = 1;
   }
   myPID.Compute();
-  digitalWrite(LED_BUILTIN, 1);
+  //digitalWrite(LED_BUILTIN, 1);
   digitalWrite(SOL_Ex, 1);
   digitalWrite(SOL_CO2, 1);
   delay(Output);
-  digitalWrite(LED_BUILTIN, 0);
+  //digitalWrite(LED_BUILTIN, 0);
   digitalWrite(SOL_CO2, 0);
   digitalWrite(SOL_Ex, 0);
   return Output;

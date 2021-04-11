@@ -58,6 +58,7 @@ HardwareSerial *O2Serial = &Serial1;
 HardwareSerial *CO2Serial = &Serial2;
 
 int pause = 0;
+int GO = 0;
 int O2Errors = 0;
 int O2_OnOff = 1;
 void setup()
@@ -90,11 +91,11 @@ void loop() // run over and over
   //The goal is to always have read a poor reading in the off cycle and not calculate based on it so that the good reading comes through at the Delay time
   int goodReading = 0; 
  
-  if(!pause){
+  if(GO){
     if(CheckTime(&previous, readTime*1000)){ //readTime is a #define above that is multiplied by 1000 to get the millisecond equivalent
         goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
   
-        if(O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*0.99))){
+        if((O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*0.99))) && !pause){
           O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
           O2Errors = 0;
         } else if (O2Percent == 100){
@@ -104,18 +105,18 @@ void loop() // run over and over
 
           Serial.print("O2Power:");
           Serial.println(O2_OnOff);
-          if(O2Errors > 3 && O2_OnOff == 1){
+          if(O2Errors >= 3 && O2_OnOff == 1){
             digitalWrite(O2_Power, 0);
             O2_OnOff = 0;
             O2Errors = 0;
-          } else if (O2Errors > 3 && O2_OnOff == 0){
+          } else if (O2Errors >= 3 && O2_OnOff == 0){
             digitalWrite(O2_Power, 1);
             O2_OnOff = 1;
             O2Errors = 0;
           }
         }
         delay(50);
-        if(CO2Percent < 10 && (CO2Percent < (CO2Setpoint*0.98)) ) {
+        if((CO2Percent < 10 && (CO2Percent < (CO2Setpoint*0.98))) && !pause) {
           CO2Solenoid = ControlCO2(CO2Percent, CO2Setpoint, CO2Kp, CO2Ki, CO2Kd);
         }
         Serial.print("V:");
@@ -133,6 +134,7 @@ void loop() // run over and over
         Serial.print(",");
         Serial.print(CO2Solenoid);
         Serial.print("\n");
+        digitalWrite(LED_BUILTIN, LOW);
     } 
     if(goodReading == 1){ // implemented to avoid the issue of every other O2 reading being extra long and bad. This only happened when increasing the delay time over 1s for some reason
         //Serial.println("Offset:");

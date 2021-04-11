@@ -13,13 +13,76 @@ import tkinter as tk
 import random
 from tkinter import filedialog
 from tkinter import messagebox
+import serial
+import time
+import csv
+import datetime
 
+
+
+def write_O2(O2):
+    O2 = "O2 " + str(O2) + "\n"
+    O2 = O2.encode()
+    arduino.write(O2)
+    time.sleep(0.02)
+
+#Sets the CO2 Setpoint
+def write_CO2(CO2):
+    CO2 = "CO2 " + str(CO2) + "\n"
+    CO2 = CO2.encode()
+    arduino.write(CO2)
+    time.sleep(0.02)   
+
+#Used to signal door open or closed to pause gasses. Val = 1 Pause, Val = 0 Run
+def write_StartStopPause(val):
+    if(val == "Start"):
+        arduino.write("Start\n".encode())
+    elif(val == "Stop"):
+        arduino.write("Stop\n".encode())
+    elif(val == "Pause"):
+        arduino.write("Pause\n".encode())
+    time.sleep(0.02)
+
+def read_ArduinoLine():
+    splitFloat = [0,0,0,0,0,0,0,0]
+    data = arduino.readline()
+    if data != b'':
+        print(data)
+        strData = data.decode("utf-8")
+        if(strData[0:2] == "V:"):
+            split = strData[2:].split(",")
+            splitFloat[0] = datetime.datetime.now()
+            for i in range(len(split)):
+                splitFloat[i+1] = float(split[i])
+            print(splitFloat)
+        
+    return splitFloat, data
+    
+
+def write_arduino(x):
+    arduino.write(bytes(x, 'utf-8'))
+    time.sleep(0.05)
+    
+def write_CSV(splitFloat, fName):
+    if(splitFloat[1] != 0):
+        with open(fName, 'a') as f:
+            writer = csv.writer(f, delimiter = ',')
+            writer.writerow(splitFloat)
+
+
+arduino = serial.Serial(port='COM7', baudrate=115200, timeout=.1)
+#arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
+#The base declartion of the array for values to be stored into
+#Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
+splitFloat = [0,0,0,0,0,0,0,0]
+pressure = 0
 ## make a window
 window = tk.Tk()
 
 #Title the window
 window.title("Hypoxia Chamber GUI")
 window.configure(bg='gold')
+FileName = ""
 
 ##Place some Title text at the top of the window
 intro_frame = tk.Frame()
@@ -69,8 +132,9 @@ pathlabel = tk.Label(master = fileframe, text = 'Insert file path to save data t
 path_entry = tk.Entry(master = fileframe, width = 50)
 
 def browsefunc():
-    filename = filedialog.askopenfilename()
-    path_entry.insert(0, filename)
+    global FileName
+    FileName = filedialog.askopenfilename()
+    path_entry.insert(0, FileName)
     
 browsebutton = tk.Button(master = fileframe, text="Browse", background = ('silver'), command=browsefunc)
 
@@ -123,7 +187,9 @@ def entry_graber(event):
             co2_accepted['text'] = ('Current Target Value: '+ co2_entry.get() +'%')
             press_accepted['text'] = ('Current Target Value: '+ press_entry.get() +'mBar')
             print(target_o2)
+            write_O2(target_o2)
             print(target_co2)
+            write_CO2(target_co2)
     else:
         setvalues_button['text'] = "Set Values"
 
@@ -169,6 +235,7 @@ cond_press_label = tk.Label(master = current_display_frame, text = "-", font =1,
 cond_press_name = tk.Label(master = current_display_frame, text = "Current pressure in mBar", fg="gold",bg="black")
 cond_press_name.grid(padx=5, pady=5)
 cond_press_label.grid(padx=5, pady=5)
+cond_press_label['text'] = 0
 
 #Update the current conditions display (currently it just cycles through random integers)
 def display_updater():
@@ -181,12 +248,20 @@ def display_updater():
     global window
     global after_ID
     global cond_press_label
-    cond_o2_label['text'] = f'{random.randint(0, 20)}'
-    cond_co2_label['text'] = f'{random.randint(0, 20)}'
-    cond_temp_label['text'] = f'{random.randint(0, 20)}'
-    cond_humid_label['text'] = f'{random.randint(0, 20)}'
-    cond_press_label['text'] = f'{random.randint(0, 20)}'
+    
     if(go_button['text'] == 'Experiment in progress...program is running. \n Press to end Experiment.'):
+        splitFloat, data = read_ArduinoLine()
+        if(splitFloat[0] != 0):
+            #pressure = splitFloat[5]
+            if(splitFloat[1] != 100):
+                cond_o2_label['text'] = splitFloat[1]
+            cond_co2_label['text'] = splitFloat[2]
+            cond_temp_label['text'] = splitFloat[3]
+            cond_humid_label['text'] = splitFloat[4]
+            cond_press_label['text'] = splitFloat[5]
+            write_CSV(splitFloat, FileName)
+        
+        
         if float(cond_press_label['text']) > float(press_entry.get()):
             notification_msg['text'] = 'Caution: Pressure exceeds set value! Exercise caution!'
             notification_msg['foreground']="red"
@@ -196,7 +271,7 @@ def display_updater():
             notification_msg['foreground']="gold"
             notification_msg['bg']="black"
         try:
-            after_ID = window.after(1000, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
+            after_ID = window.after(100, display_updater) # To avoid errors with .after method, make it a global variable and use .after_cancel (when the window is closed)
             after_ID
         except:
             pass
@@ -212,6 +287,7 @@ def toggle_gobutton_appearance():
         notification_msg['text'] = 'Do not forget to pause the program to open the door.'
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
+        write_StartStopPause("Start")
     else:
         window.after_cancel(after_ID)
         go_button['text'] = 'Begin Experiment'
@@ -219,6 +295,7 @@ def toggle_gobutton_appearance():
         go_button['background']="green"
         notification_msg['foreground']="gold"
         notification_msg['bg']="black"
+        write_StartStopPause("Stop")
         
 go_button = tk.Button(master = gobutton_frame, text="Begin Experiment", background=("green"), width = 40, height = 2, relief = "ridge", borderwidth = 5, command = lambda:[toggle_gobutton_appearance(), display_updater()])
 go_button.grid()
@@ -228,9 +305,11 @@ def toggle_pausebutton_appearance():
     if (pause_button['text'] == "Pause Experiment"):
         pause_button['text'] = 'Experiment paused. Press to resume.'
         notification_msg['text'] = 'Program is paused. Door may be opened.'
+        write_StartStopPause("Pause")
     else:
         pause_button['text'] = "Pause Experiment"
         notification_msg['text'] = 'Do not forget to pause the program to open the door.'
+        write_StartStopPause("Pause")
 
 pause_button = tk.Button(master = gobutton_frame, text = "Pause Experiment", background = ('silver'), width = 40, height = 1, relief = 'ridge', borderwidth = 5, command = toggle_pausebutton_appearance)
 pause_button.grid()    
@@ -256,8 +335,14 @@ window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit? \n (Be sure to stop experiments before quitting!)"):
         window.destroy()
+        arduino.close()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
 
 #Run the window for viewing
 window.mainloop()
+
+
+
+
+
