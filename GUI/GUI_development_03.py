@@ -207,31 +207,31 @@ conditions_label = tk.Label(master = current_display_frame, text = "Current Cond
 conditions_label.grid(padx=5, pady=5)
 
 #Display the current o2 values
-cond_o2_label = tk.Label(master = current_display_frame, text = "-", font =1, fg="gold",bg="black")
+cond_o2_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_o2_name = tk.Label(master = current_display_frame, text = "Current percent oxygen", fg="gold",bg="black")
 cond_o2_name.grid(padx=5, pady=5)
 cond_o2_label.grid(padx=5, pady=5)
 
 #Display the current co2 values
-cond_co2_label = tk.Label(master = current_display_frame, text = "-", font =1, fg="gold",bg="black")
+cond_co2_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_co2_name = tk.Label(master = current_display_frame, text = "Current percent carbon dioxide", fg="gold",bg="black")
 cond_co2_name.grid(padx=5, pady=5)
 cond_co2_label.grid(padx=5, pady=5)
 
 #Display the current temperature
-cond_temp_label = tk.Label(master = current_display_frame, text = "-", font =1, fg="gold",bg="black")
+cond_temp_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_temp_name = tk.Label(master = current_display_frame, text = "Current temperature in Celsius", fg="gold",bg="black")
 cond_temp_name.grid(padx=5, pady=5)
 cond_temp_label.grid(padx=5, pady=5)
 
 #Display the current humidity
-cond_humid_label = tk.Label(master = current_display_frame, text = "-", font =1, fg="gold",bg="black")
+cond_humid_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_humid_name = tk.Label(master = current_display_frame, text = "Current percent relative humidity", fg="gold",bg="black")
 cond_humid_name.grid(padx=5, pady=5)
 cond_humid_label.grid(padx=5, pady=5)
 
 #Display the current pressure
-cond_press_label = tk.Label(master = current_display_frame, text = "-", font =1, fg="gold",bg="black")
+cond_press_label = tk.Label(master = current_display_frame, text = "-", fg="gold",bg="black")
 cond_press_name = tk.Label(master = current_display_frame, text = "Current pressure in mBar", fg="gold",bg="black")
 cond_press_name.grid(padx=5, pady=5)
 cond_press_label.grid(padx=5, pady=5)
