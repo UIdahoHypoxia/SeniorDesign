@@ -22,11 +22,11 @@
 
 //#define Debug 1
 
-#define SOL_O2 22
-#define SOL_CO2 23
-#define SOL_Ex 24
+#define SOL_O2 25
+#define SOL_CO2 24
+#define SOL_Ex 22
 
-#define O2_Power 10
+#define O2_Power 52
 
 #define UpperO2Time 2000   // Max time the solenoid can open for at once
 #define UpperCO2Time 1200
