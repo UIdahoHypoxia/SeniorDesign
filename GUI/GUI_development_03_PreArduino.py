@@ -2,8 +2,9 @@
 """
 Created on Mon Mar 22 09:14:04 2021
 @authors: Izzie Strawn, Colin Marchus, Jacob Knudson, Andrew Hartman, Alex Morrison
-Progress notes:
-*Why does setvalues_button need to be pressed twice? something is wrong...
+Notes:
+    *This program is for the GUI of a custom hypoxia chamber setup
+    *The 'Set Values' button needs to be pressed twice the first time for some reason.
 """
 
 ## import modules
@@ -11,6 +12,7 @@ import tkinter as tk
 import random
 from tkinter import filedialog
 from tkinter import messagebox
+from datetime import datetime
 
 ## make a window
 window = tk.Tk()
@@ -62,15 +64,21 @@ press_entry = tk.Entry(master = pressframe)
 press_entry.grid( padx=5, pady=5)
 
 
-## Make a place to input a file path
-pathlabel = tk.Label(master = fileframe, text = 'Insert file path to save data to:', fg="gold",bg="black")
+## Make a place to input a file path and file name
+pathlabel = tk.Label(master = fileframe, text = 'Insert folder path to save data to:', fg="gold",bg="black")
 path_entry = tk.Entry(master = fileframe, width = 50)
+file_name_label = tk.Label(master = (fileframe), text = 'Insert file name')
+file_name_entry = tk.Entry(master=(fileframe), width = 50)
 
 def browsefunc():
-    filename = filedialog.askopenfilename()
-    path_entry.insert(0, filename)
-    
-browsebutton = tk.Button(master = fileframe, text="Browse", background = ('silver'), command=browsefunc)
+    filename = filedialog.askdirectory()
+    if len(path_entry.get()) == 0:
+        timestamp = datetime.now()
+        path_entry.insert(0, filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv')
+    else:
+        pass
+       
+browsebutton = tk.Button(master = fileframe, text="Browse", background = ('silver'), command= browsefunc)
 
 # Grab File path
 def path_graber():
@@ -79,10 +87,16 @@ def path_graber():
 
 submit_button = tk.Button(master = fileframe, text = 'Submit file path', background = ('silver'), command = path_graber)
 
-pathlabel.grid(columnspan =3, padx=5, pady=5)
-browsebutton.grid(row = 1, column = 0, padx=5, pady=5)
-path_entry.grid(row = 1, column = 1, padx=5, pady=5)
-submit_button.grid(row = 2, columnspan=2, padx=5, pady=5)
+pathlabel.grid(columnspan =4, padx=5, pady=5)
+browsebutton.grid(row = 3, column = 0, padx=5, pady=5)
+file_name_label.grid(row = 1, column = 0)
+file_name_entry.grid(row = 1, column = 1, columnspan = 2)
+path_entry.grid(row = 3, column = 1, columnspan = 2, padx=5, pady=5)
+submit_button.grid(row = 4, column = 1, padx=5, pady=5)
+
+# Make a button to transfer the file to a different location
+transferbutton = tk.Button(master = fileframe, text = "Export file", background = ('silver'))
+transferbutton.grid(row = 4, column = 2)
 
 # Make a label to display the accepted target values
 o2_accepted = tk.Label(master = oxyframe, text = 'Current Target Value:'+ '-' +'%', fg="gold",bg="black")
