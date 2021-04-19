@@ -65,9 +65,9 @@ press_entry.grid( padx=5, pady=5)
 
 
 ## Make a place to input a file path and file name
-pathlabel = tk.Label(master = fileframe, text = 'Insert folder path to save data to:', fg="gold",bg="black")
+pathlabel = tk.Label(master = fileframe, text = 'Folder path to save data to:', fg="gold",bg="black")
 path_entry = tk.Entry(master = fileframe, width = 50)
-file_name_label = tk.Label(master = (fileframe), text = 'Insert file name')
+file_name_label = tk.Label(master = (fileframe), text = 'Insert file name here:', fg="gold",bg="black")
 file_name_entry = tk.Entry(master=(fileframe), width = 50)
 
 def browsefunc():
