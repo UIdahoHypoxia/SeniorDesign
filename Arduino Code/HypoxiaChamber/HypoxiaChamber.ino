@@ -95,7 +95,7 @@ void loop() // run over and over
         goodReading = readings(&O2Percent, &CO2Percent, &Temp, &Humidity, &Pressure);
         O2Solenoid = -1; // Default to -1 so that whenever a solenoid does not get controlled it sends a -1 and the user can tell when the solenoids are opening or not.
         CO2Solenoid = -1;
-        if((O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*0.99))) && !pause){
+        if((O2Percent < 25 && (CO2Percent >= (CO2Setpoint  * 0.9)) && (O2Percent > (O2Setpoint*1.01))) && !pause){
           O2Solenoid = ControlO2(O2Percent, O2Setpoint, O2Kp, O2Ki, O2Kd);
           O2Errors = 0;
         } else if (O2Percent == 100){

@@ -69,7 +69,7 @@ def write_CSV(splitFloat, fName):
             writer.writerow(splitFloat)
 
 
-arduino = serial.Serial(port='COM7', baudrate=115200, timeout=.1)
+arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
 #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
 #Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
@@ -81,7 +81,7 @@ window = tk.Tk()
 #Title the window
 window.title("Hypoxia Chamber GUI")
 window.configure(bg='gold')
-FileName = ""
+FileName = "C:/Users/Ironm/Documents/GitHub/SeniorDesign/IncubatorTests/Tests.csv"
 
 ##Place some Title text at the top of the window
 intro_frame = tk.Frame()
@@ -134,8 +134,11 @@ file_name_entry = tk.Entry(master=(fileframe), width = 50)
 def browsefunc():
     filename = filedialog.askdirectory()
     if len(path_entry.get()) == 0:
-        timestamp = datetime.now()
-        path_entry.insert(0, filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv')
+        #timestamp = datetime.now()
+        FileName = filename + '/' + file_name_entry.get() + '.csv'
+        path_entry.insert(0, FileName)
+        # timestamp = datetime.now()
+        # path_entry.insert(0, filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv')
     else:
         pass
        
