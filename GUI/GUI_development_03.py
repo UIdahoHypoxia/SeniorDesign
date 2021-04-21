@@ -32,7 +32,7 @@ def write_CO2(CO2):
     arduino.write(CO2)
     time.sleep(0.02)   
 
-#Used to signal door open or closed to pause gasses. Val = 1 Pause, Val = 0 Run
+#Used to signal door open or closed to pause gasses. val = "Start" will start the arduino, sensing and Solenoid control, "Stop" will stop the arduino sensing and solenoid control, "Pause" will toggle solenoid control but will keep sensing and coms running
 def write_StartStopPause(val):
     if(val == "Start"):
         arduino.write("Start\n".encode())
