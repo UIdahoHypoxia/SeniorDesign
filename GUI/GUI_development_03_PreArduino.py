@@ -13,7 +13,13 @@ import random
 from tkinter import filedialog
 from tkinter import messagebox
 from datetime import datetime
+from shutil import copy
 
+
+def export_to_USB(src,dst):
+    copy(src,dst)
+
+FileName = ''
 ## make a window
 window = tk.Tk()
 
@@ -71,10 +77,12 @@ file_name_label = tk.Label(master = (fileframe), text = 'Insert file name here:'
 file_name_entry = tk.Entry(master=(fileframe), width = 50)
 
 def browsefunc():
+    global FileName
     filename = filedialog.askdirectory()
     if len(path_entry.get()) == 0:
         timestamp = datetime.now()
-        path_entry.insert(0, filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv')
+        FileName = filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv'
+        path_entry.insert(0, FileName)
     else:
         pass
        
@@ -94,8 +102,12 @@ file_name_entry.grid(row = 1, column = 1, columnspan = 2)
 path_entry.grid(row = 3, column = 1, columnspan = 2, padx=5, pady=5)
 submit_button.grid(row = 4, column = 1, padx=5, pady=5)
 
+def exportBrowse():
+    filename = filedialog.askdirectory()
+    export_to_USB(FileName,filename)
+
 # Make a button to transfer the file to a different location
-transferbutton = tk.Button(master = fileframe, text = "Export file", background = ('silver'))
+transferbutton = tk.Button(master = fileframe, text = "Export file", background = ('silver'), command = exportBrowse)
 transferbutton.grid(row = 4, column = 2)
 
 # Make a label to display the accepted target values

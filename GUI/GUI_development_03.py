@@ -69,7 +69,7 @@ def write_CSV(splitFloat, fName):
             writer.writerow(splitFloat)
             
 def export_to_USB(src,dst):
-    shutil.copyfile(src,dst)
+    shutil.copy(src,dst)
 
 
 arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
@@ -84,7 +84,7 @@ window = tk.Tk()
 #Title the window
 window.title("Hypoxia Chamber GUI")
 window.configure(bg='gold')
-FileName = "C:/Users/Ironm/Documents/GitHub/SeniorDesign/IncubatorTests/Tests.csv"
+FileName = ""
 
 ##Place some Title text at the top of the window
 intro_frame = tk.Frame()
@@ -135,16 +135,15 @@ file_name_label = tk.Label(master = (fileframe), text = 'Insert file name here:'
 file_name_entry = tk.Entry(master=(fileframe), width = 50)
 
 def browsefunc():
+    global FileName
     filename = filedialog.askdirectory()
     if len(path_entry.get()) == 0:
-        #timestamp = datetime.now()
-        FileName = filename + '/' + file_name_entry.get() + '.csv'
+        timestamp = datetime.now()
+        FileName = filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv'
         path_entry.insert(0, FileName)
-        # timestamp = datetime.now()
-        # path_entry.insert(0, filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv')
     else:
         pass
-       
+    
 browsebutton = tk.Button(master = fileframe, text="Browse", background = ('silver'), command= browsefunc)
 
 # Grab File path
@@ -161,8 +160,12 @@ file_name_entry.grid(row = 1, column = 1, columnspan = 2)
 path_entry.grid(row = 3, column = 1, columnspan = 2, padx=5, pady=5)
 submit_button.grid(row = 4, column = 1, padx=5, pady=5)
 
+def exportBrowse():
+    filename = filedialog.askdirectory()
+    export_to_USB(FileName,filename)
+
 # Make a button to transfer the file to a different location
-transferbutton = tk.Button(master = fileframe, text = "Export file", background = ('silver'))
+transferbutton = tk.Button(master = fileframe, text = "Export file", background = ('silver'), command = exportBrowse)
 transferbutton.grid(row = 4, column = 2)
 
 # Make a label to display the accepted target values
