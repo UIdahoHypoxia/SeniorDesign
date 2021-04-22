@@ -16,7 +16,7 @@ import serial
 import time
 import csv
 import datetime
-
+import shutil
 
 
 def write_O2(O2):
@@ -64,9 +64,12 @@ def write_arduino(x):
     
 def write_CSV(splitFloat, fName):
     if(splitFloat[1] != 0):
-        with open(fName, 'a') as f:
+        with open(fName, 'a',newline='') as f:
             writer = csv.writer(f, delimiter = ',')
             writer.writerow(splitFloat)
+            
+def export_to_USB(src,dst):
+    shutil.copyfile(src,dst)
 
 
 arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
