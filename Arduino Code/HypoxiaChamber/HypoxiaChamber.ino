@@ -38,7 +38,7 @@ double O2Setpoint = 1.0;
 
 double O2Kp=140, O2Ki=5, O2Kd=0;
 
-double CO2Kp=200, CO2Ki=5, CO2Kd=0;
+double CO2Kp=150, CO2Ki=5, CO2Kd=0;
 
 int Debug = 0;
 String inputString;         // a String to hold incoming data
