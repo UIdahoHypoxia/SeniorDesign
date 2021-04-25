@@ -18,6 +18,18 @@ import csv
 import datetime
 import shutil
 
+#Default Values for filling in the entries with Grey text
+O2_Preload = 5
+CO2_Preload= 5
+Pres_Preload = 940
+filename_Preload = "Filename Suffix"
+filePath_Preload = "D:/.../MMDDYY_HHMM_FilenameSuffix.csv"
+Time_Preload = 10
+KpO2_Preload = 200
+KiO2_Preload = 5
+KpCO2_Preload = 140
+KiCO2_Preload = 5
+
 
 def write_O2(O2):
     O2 = "O2 " + str(O2) + "\n"
@@ -70,6 +82,126 @@ def write_CSV(splitFloat, fName):
             
 def export_to_USB(src,dst):
     shutil.copy(src,dst)
+        
+def on_entry_click(eff=None, entry=None):
+    """function that gets called whenever entry is clicked"""
+    if entry != None:
+        if entry.cget('fg') == 'grey':
+           entry.delete(0, "end") # delete all the text in the entry
+           entry.insert(0, '') #Insert blank for user input
+           entry.config(fg = 'black')
+def on_focusout(eff = None, entry = None, PreLoad = 'Filler'):
+    if entry != None:
+        if len(entry.get()) - entry.get().count(' ') < 1 :
+            entry.insert(0, PreLoad)
+            entry.config(fg = 'grey')
+
+def preload_Text(entry = None, Preload = "Not Defined"):
+    if(entry != None):
+        entry.insert(0, Preload)
+        entry.bind('<FocusIn>', lambda eff: on_entry_click(eff, entry))
+        entry.bind('<FocusOut>', lambda eff: on_focusout(eff, entry, Preload))
+        entry.config(fg = 'grey')
+
+def create_window():
+    upperWindow = tk.Toplevel(window)
+    upperWindow.title("Hypoxia Chamber Settings GUI")
+    upperWindow.configure(bg='gold')
+   
+    intro_frame = tk.Frame(master = upperWindow)
+    intro_label = tk.Label(master = intro_frame, text = "Control Settings", font=("Arial",15), bg=("gold"))
+    intro_label.grid() 
+   
+    settingsWindow_frame = tk.Frame(master = upperWindow, relief = 'ridge', borderwidth = 5, bg = "black")
+    
+    # all of the labels and Entries go here ****************
+    
+    #create a textbox where the time to wait between measurements can be input
+    measure_label = tk.Label(master = settingsWindow_frame, text = "Measurement Interval (s)", fg="gold",bg="black")
+    measure_entry = tk.Entry(master = settingsWindow_frame)
+    preload_Text(measure_entry, Time_Preload)
+
+    
+    measure_label.grid(row=0, column=0)
+    measure_entry.grid(row=0, column = 1, padx=5, pady=5) 
+    
+    #O2 PID values
+    #create a textbox where the Kp for O2 can be set
+    KpO2_label = tk.Label(master = settingsWindow_frame, text = "Kp for O2", fg="gold",bg="black")
+    KpO2_entry = tk.Entry(master = settingsWindow_frame)
+    preload_Text(KpO2_entry, KpO2_Preload)
+    
+    KpO2_label.grid(row=1, column=0)
+    KpO2_entry.grid(row=1, column = 1, padx=5, pady=5) 
+    
+    #create a textbox where the Ki for O2 can be set
+    KiO2_label = tk.Label(master = settingsWindow_frame, text = "Ki for O2", fg="gold",bg="black")
+    KiO2_entry = tk.Entry(master = settingsWindow_frame)
+    preload_Text(KiO2_entry, KiO2_Preload)
+    
+    KiO2_label.grid(row=2, column=0)
+    KiO2_entry.grid(row=2, column = 1, padx=5, pady=5) 
+    
+    #CO2 PID values    
+    #create a textbox where the Kp for O2 can be set
+    KpCO2_label = tk.Label(master = settingsWindow_frame, text = "Kp for CO2", fg="gold",bg="black")
+    KpCO2_entry = tk.Entry(master = settingsWindow_frame)
+    preload_Text(KpCO2_entry, KpCO2_Preload)
+    
+    KpCO2_label.grid(row=3, column=0)
+    KpCO2_entry.grid(row=3, column = 1, padx=5, pady=5) 
+  
+    
+    #create a textbox where the Ki for O2 can be set
+    KiCO2_label = tk.Label(master = settingsWindow_frame, text = "Ki for CO2", fg="gold",bg="black")
+    KiCO2_entry = tk.Entry(master = settingsWindow_frame)
+    preload_Text(KiCO2_entry, KiCO2_Preload)
+    
+    KiCO2_label.grid(row=4, column=0)
+    KiCO2_entry.grid(row=4, column = 1, padx=5, pady=5)
+    
+    def set_Values():
+        measureTime = float(measure_entry.get()) #assigns the input target o2 percentage to a variable
+        KpO2 = float(KpO2_entry.get())
+        KiO2 = float(KiO2_entry.get())
+        KpCO2 = float(KpCO2_entry.get())
+        KiCO2 = float(KiCO2_entry.get())
+        print(measureTime)
+        print(KpO2)
+        print(KiO2)
+        print(KpCO2)
+        print(KiCO2)
+        
+        #write_arduino("time " + measureTime)
+        #write_arduino("KpO2 " + KpO2)
+        #write_arduino("KiO2 " + KiO2)
+        #write_arduino("KpCO2 " + KpCO2)
+        #write_arduino("KiCO2 " + KiCO2)
+        
+        setValues_label['text'] = ("Values Saved")
+        measure_entry.config(fg = 'black')
+        KpO2_entry.config(fg = 'black')
+        KiO2_entry.config(fg = 'black')
+        KpCO2_entry.config(fg = 'black')
+        KiCO2_entry.config(fg = 'black')
+    
+    #End of Set Values
+    setValues_label = tk.Label(master = settingsWindow_frame, text = "", fg = "gold", bg = "black")
+    setValues_label.grid(row = 5, column = 0)
+    
+    setvalues_button = tk.Button(master = settingsWindow_frame, text="Set values", background = ('silver'), width = 15, height = 1, relief = "ridge", borderwidth = 5, fg="black", command = set_Values)
+    setvalues_button.grid(row = 5, column = 1)
+    
+    
+    #Organize the frames of the settings window
+    intro_frame.grid(row = 0, column = 0)
+    settingsWindow_frame.columnconfigure([0,1,2,3,4,5,6], weight = 1 )
+    settingsWindow_frame.grid(row = 1, column =0, padx=3, pady=3)
+
+    
+    upperWindow.columnconfigure([0], weight=1, minsize=75)
+    upperWindow.rowconfigure([0,1,2,3], weight=1, minsize=50)
+#End of Upper Window
 
 
 arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
@@ -100,6 +232,7 @@ fileframe = tk.Frame(master = Target_frame, relief = 'ridge', borderwidth = 5, b
 current_display_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
 setbutton_frame = tk.Frame(master = Target_frame)
 gobutton_frame = tk.Frame()
+settings_frame = tk.Frame()
 errorbox_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
 
 # Make a function combiner so that a button can perform multiple commands:
@@ -116,23 +249,28 @@ target_title.grid(row = 0, columnspan = 2, padx=5, pady=5)
 #Make a place to input the oxygen percentage
 o2_label = tk.Label(master = oxyframe, text = "Percent Oxygen", fg="gold",bg="black").grid(row=1, column=0)
 o2_entry = tk.Entry(master = oxyframe)
+preload_Text(o2_entry, O2_Preload)
 o2_entry.grid(row=2, column = 0, padx=5, pady=5) #create a textbox where the percent oxygen can be input
 
 #Make a place to input the CO2 percentage
 co2_label = tk.Label(master = carbframe, text = "Percent Carbon Dioxide", fg="gold",bg="black").grid() # label for co2 input entry
 co2_entry = tk.Entry(master = carbframe)
+preload_Text(co2_entry, CO2_Preload)
 co2_entry.grid( padx=5, pady=5)
 
 # Make a place to inut pressure calibration step
 press_label = tk.Label(master =pressframe, text = "Pressure Calibration", fg="gold",bg="black").grid()
 press_entry = tk.Entry(master = pressframe)
+preload_Text(press_entry, Pres_Preload)
 press_entry.grid( padx=5, pady=5)
 
 ## Make a place to input a file path and file name
 pathlabel = tk.Label(master = fileframe, text = 'Folder path to save data to:', fg="gold",bg="black")
 path_entry = tk.Entry(master = fileframe, width = 50)
+preload_Text(path_entry, filePath_Preload)
 file_name_label = tk.Label(master = (fileframe), text = 'Insert file name here:', fg="gold",bg="black")
 file_name_entry = tk.Entry(master=(fileframe), width = 50)
+preload_Text(file_name_entry, filename_Preload)
 
 def browsefunc():
     global FileName
@@ -330,7 +468,10 @@ def toggle_pausebutton_appearance():
         write_StartStopPause("Pause")
 
 pause_button = tk.Button(master = gobutton_frame, text = "Pause Experiment", background = ('silver'), width = 40, height = 1, relief = 'ridge', borderwidth = 5, command = toggle_pausebutton_appearance)
-pause_button.grid()    
+pause_button.grid()  
+
+settings_button = tk.Button(master = settings_frame, text = "Settings", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=create_window)
+settings_button.grid()   
 
 #Display the frames
 
@@ -343,6 +484,7 @@ setbutton_frame.grid(row = 2, column =1, padx=3, pady=3)
 fileframe.grid(columnspan = 2, padx=3, pady=3)
 current_display_frame.grid(row = 0, column = 1, rowspan = 4, padx=3, pady=3)
 gobutton_frame.grid(row = 2, padx=3, pady=3)
+settings_frame.grid(row = 3, column = 1, padx=3, pady=3)
 errorbox_frame.grid(row = 3, columnspan = 2, padx=3, pady=3)
 
 #These lines make the frames adjust when the window size is changed
