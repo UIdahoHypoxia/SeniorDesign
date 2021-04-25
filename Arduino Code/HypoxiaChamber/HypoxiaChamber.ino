@@ -31,8 +31,9 @@
 #define UpperO2Time 2000   // Max time the solenoid can open for at once
 #define UpperCO2Time 1200
 
-#define readTime 7 // Time between sensor readings and solenoids, in seconds
+//#define readTime 7 // Time between sensor readings and solenoids, in seconds
 
+int readTime = 7;
 double CO2Setpoint = 5.0;
 double O2Setpoint = 1.0;
 

@@ -72,6 +72,21 @@ void CommandParse(String input){
     else if(input.substring(0,4) == "Stop") {
       GO = 0;
     }
+    else if(input.substring(0,4) == "time"){
+      readTime = input.substring(4).toInt();
+    }
+    else if(input.substring(0,4) == "KpO2"){
+      O2Kp = input.substring(4).toFloat();
+    }
+    else if(input.substring(0,4) == "KiO2"){
+      O2Ki = input.substring(4).toFloat();
+    }
+    else if(input.substring(0,5) == "KpCO2"){
+      CO2Kp = input.substring(5).toFloat();
+    }
+    else if(input.substring(0,5) == "KiCO2"){
+      CO2Ki = input.substring(5).toFloat();
+    }
     else {
        digitalWrite(LED_BUILTIN, HIGH);
        Serial.println(input);

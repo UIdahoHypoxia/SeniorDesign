@@ -71,7 +71,7 @@ def read_ArduinoLine():
     
 
 def write_arduino(x):
-    arduino.write(bytes(x, 'utf-8'))
+    arduino.write(x.encode())
     time.sleep(0.05)
     
 def write_CSV(splitFloat, fName):
@@ -109,8 +109,11 @@ def create_window():
     upperWindow.configure(bg='gold')
    
     intro_frame = tk.Frame(master = upperWindow)
+    intro_frame.configure(bg='gold')
     intro_label = tk.Label(master = intro_frame, text = "Control Settings", font=("Arial",15), bg=("gold"))
+    intro_label_2 = tk.Label(master = intro_frame, text = "Must be set before beginning experiment", font=("Arial",10), bg=("gold"))
     intro_label.grid() 
+    intro_label_2.grid()
    
     settingsWindow_frame = tk.Frame(master = upperWindow, relief = 'ridge', borderwidth = 5, bg = "black")
     
@@ -161,22 +164,34 @@ def create_window():
     KiCO2_entry.grid(row=4, column = 1, padx=5, pady=5)
     
     def set_Values():
-        measureTime = float(measure_entry.get()) #assigns the input target o2 percentage to a variable
-        KpO2 = float(KpO2_entry.get())
-        KiO2 = float(KiO2_entry.get())
-        KpCO2 = float(KpCO2_entry.get())
-        KiCO2 = float(KiCO2_entry.get())
+        measureTime = measure_entry.get() #assigns the input target o2 percentage to a variable
+        KpO2 = KpO2_entry.get()
+        KiO2 = KiO2_entry.get()
+        KpCO2 = KpCO2_entry.get()
+        KiCO2 = KiCO2_entry.get()
         print(measureTime)
         print(KpO2)
         print(KiO2)
         print(KpCO2)
         print(KiCO2)
         
-        #write_arduino("time " + measureTime)
-        #write_arduino("KpO2 " + KpO2)
-        #write_arduino("KiO2 " + KiO2)
-        #write_arduino("KpCO2 " + KpCO2)
-        #write_arduino("KiCO2 " + KiCO2)
+        global Time_Preload
+        global KpO2_Preload
+        global KiO2_Preload
+        global KpCO2_Preload
+        global KiCO2_Preload
+    
+        Time_Preload = measureTime
+        KpO2_Preload = KpO2
+        KiO2_Preload = KiO2
+        KpCO2_Preload = KpCO2
+        KiCO2_Preload = KiCO2
+        
+        write_arduino("time " + measureTime)
+        write_arduino("KpO2 " + KpO2)
+        write_arduino("KiO2 " + KiO2)
+        write_arduino("KpCO2 " + KpCO2)
+        write_arduino("KiCO2 " + KiCO2)
         
         setValues_label['text'] = ("Values Saved")
         measure_entry.config(fg = 'black')
@@ -204,7 +219,25 @@ def create_window():
 #End of Upper Window
 
 
-arduino = serial.Serial(port='COM5', baudrate=115200, timeout=.1)
+def get_ports():
+    ports = serial.tools.list_ports.comports()
+    return ports
+def findArduino(portsFound):
+    commPort = 'None'
+    numConnections = len(portsFound)
+    
+    for i in range(0, numConnections):
+        port = portsFound[i]
+        strPort = str(port)
+        
+        if 'Arduino' in strPort:
+            splitPort = strPort.split(' ')
+            commPort = splitPort[0]
+    return commPort
+
+arduinoPort = findArduino(get_ports())
+
+arduino = serial.Serial(port=arduinoPort, baudrate=115200, timeout=.1)
 #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
 #Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
@@ -275,8 +308,11 @@ preload_Text(file_name_entry, filename_Preload)
 def browsefunc():
     global FileName
     filename = filedialog.askdirectory()
+    if path_entry.cget('fg') == 'grey':
+        path_entry.delete(0, "end") # delete all the text in the entry
+        path_entry.config(fg = 'black')
     if len(path_entry.get()) == 0:
-        timestamp = datetime.now()
+        timestamp = datetime.datetime.now()
         FileName = filename + '/' + timestamp.strftime("%m%d%y_%H%M") + '_' + file_name_entry.get() + '.csv'
         path_entry.insert(0, FileName)
     else:
