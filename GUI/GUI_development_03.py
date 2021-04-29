@@ -13,6 +13,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import serial
+import serial.tools.list_ports
 import time
 import csv
 import datetime
@@ -29,6 +30,51 @@ KpO2_Preload = 200
 KiO2_Preload = 5
 KpCO2_Preload = 140
 KiCO2_Preload = 5
+
+
+def read_Settings():
+    global O2_Preload
+    global CO2_Preload
+    global Pres_Preload
+    global filename_Preload
+    global filePath_Preload
+    global  Time_Preload
+    global  KpO2_Preload
+    global KiO2_Preload
+    global KpCO2_Preload
+    global KiCO2_Preload
+    with open("settings.csv", 'r') as f:
+        reader = csv.reader(f)
+        settings = next(reader)
+
+    O2_Preload = settings[0]
+    CO2_Preload= settings[1]
+    Pres_Preload = settings[2]
+    #filename_Preload = settings[3]
+    #filePath_Preload = settings[4]
+    Time_Preload = settings[5]
+    KpO2_Preload = settings[6]
+    KiO2_Preload = settings[7]
+    KpCO2_Preload = settings[8]
+    KiCO2_Preload = settings[9]
+    
+
+def write_Settings():
+    global O2_Preload
+    global CO2_Preload
+    global Pres_Preload
+    global filename_Preload
+    global filePath_Preload
+    global  Time_Preload
+    global  KpO2_Preload
+    global KiO2_Preload
+    global KpCO2_Preload
+    global KiCO2_Preload
+    settings = [o2_entry.get(), co2_entry.get(),press_entry.get(),file_name_entry.get(), path_entry.get(), Time_Preload, KpO2_Preload, KiO2_Preload, KpCO2_Preload,KiCO2_Preload]
+    with open("settings.csv", 'w') as f:
+        writer = csv.writer(f, delimiter = ',')
+        writer.writerow(settings)
+
 
 
 def write_O2(O2):
@@ -234,10 +280,23 @@ def findArduino(portsFound):
             splitPort = strPort.split(' ')
             commPort = splitPort[0]
     return commPort
+def connect_arduino():
+    global arduino
+    global arduinoConnected
+    if(arduinoConnected == False):
+        port = findArduino(get_ports())
+        if 'None' in port:
+            return
+        else:
+            arduino = serial.Serial(port=port, baudrate=115200, timeout = 0.1)
+            connect_button.config(bg = 'green')
+            connect_button.config(text = 'Arduino\nConnected')
+            arduinoConnected = True
 
-arduinoPort = findArduino(get_ports())
+arduinoConnected = False
 
-arduino = serial.Serial(port=arduinoPort, baudrate=115200, timeout=.1)
+
+
 #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
 #Time, O2, CO2, Temp, Humidity, Pressure, O2Solenoid Time, CO2Solenoid Time
@@ -245,7 +304,7 @@ splitFloat = [0,0,0,0,0,0,0,0]
 pressure = 0
 ## make a window
 window = tk.Tk()
-
+read_Settings()
 #Title the window
 window.title("Hypoxia Chamber GUI")
 window.configure(bg='gold')
@@ -265,7 +324,7 @@ fileframe = tk.Frame(master = Target_frame, relief = 'ridge', borderwidth = 5, b
 current_display_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
 setbutton_frame = tk.Frame(master = Target_frame)
 gobutton_frame = tk.Frame()
-settings_frame = tk.Frame()
+settings_frame = tk.Frame(bg="gold")
 errorbox_frame = tk.Frame(relief = 'ridge', borderwidth = 5, bg="black")
 
 # Make a function combiner so that a button can perform multiple commands:
@@ -506,8 +565,17 @@ def toggle_pausebutton_appearance():
 pause_button = tk.Button(master = gobutton_frame, text = "Pause Experiment", background = ('silver'), width = 40, height = 1, relief = 'ridge', borderwidth = 5, command = toggle_pausebutton_appearance)
 pause_button.grid()  
 
-settings_button = tk.Button(master = settings_frame, text = "Settings", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=create_window)
-settings_button.grid()   
+settings_button = tk.Button(master = settings_frame, text = "PID Settings", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=create_window)
+settings_button.grid(row=0, column = 0, padx=5, pady=5) 
+
+save_settings_button = tk.Button(master = settings_frame, text = "Save Settings\nTo File", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=write_Settings)
+save_settings_button.grid(row=0, column = 1, padx=5)  
+
+Load_settings_button = tk.Button(master = settings_frame, text = "Load Settings\nFrom File", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=read_Settings)
+Load_settings_button.grid(row=1, column = 1, padx=5)  
+
+connect_button = tk.Button(master = settings_frame, text = "Connect\nArduino", background = ('red'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=connect_arduino)
+connect_button.grid(row=1, column = 0, padx=5, pady=5)  
 
 #Display the frames
 
@@ -521,7 +589,7 @@ fileframe.grid(columnspan = 2, padx=3, pady=3)
 current_display_frame.grid(row = 0, column = 1, rowspan = 4, padx=3, pady=3)
 gobutton_frame.grid(row = 2, padx=3, pady=3)
 settings_frame.grid(row = 3, column = 1, padx=3, pady=3)
-errorbox_frame.grid(row = 3, columnspan = 2, padx=3, pady=3)
+errorbox_frame.grid(row = 3, columnspan = 1, padx=3, pady=3)
 
 #These lines make the frames adjust when the window size is changed
 window.columnconfigure([0,1], weight=1, minsize=75)
@@ -531,9 +599,12 @@ window.rowconfigure([0,1,2,3], weight=1, minsize=50)
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit? \n (Be sure to stop experiments before quitting!)"):
         window.destroy()
-        arduino.close()
+        if(arduinoConnected):
+            arduino.close()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
+
+connect_arduino()
 
 #Run the window for viewing
 window.mainloop()
