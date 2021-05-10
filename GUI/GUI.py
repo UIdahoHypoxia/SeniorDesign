@@ -31,7 +31,11 @@ KiO2_Preload = 5
 KpCO2_Preload = 140
 KiCO2_Preload = 5
 
+#The file path for the settings csv file.
+#settings_Path = "/home/pi/HYPOXIA/settings.csv"
+settings_Path =  "./settings.csv"
 
+#Read the values from settings.csv and store it into the appropriate global variables
 def read_Settings():
     global O2_Preload
     global CO2_Preload
@@ -43,7 +47,7 @@ def read_Settings():
     global KiO2_Preload
     global KpCO2_Preload
     global KiCO2_Preload
-    with open("./settings.csv", 'r') as f:
+    with open(settings_Path, 'r') as f:
         reader = csv.reader(f)
         settings = next(reader)
 
@@ -58,7 +62,7 @@ def read_Settings():
     KpCO2_Preload = settings[8]
     KiCO2_Preload = settings[9]
     
-
+#Save the current settings to the CSV for future reads
 def write_Settings():
     global O2_Preload
     global CO2_Preload
@@ -71,12 +75,12 @@ def write_Settings():
     global KpCO2_Preload
     global KiCO2_Preload
     settings = [o2_entry.get(), co2_entry.get(),press_entry.get(),file_name_entry.get(), path_entry.get(), Time_Preload, KpO2_Preload, KiO2_Preload, KpCO2_Preload,KiCO2_Preload]
-    with open("settings.csv", 'w') as f:
+    with open(settings_Path, 'w') as f:
         writer = csv.writer(f, delimiter = ',')
         writer.writerow(settings)
 
 
-
+#Write the passed in O2 value to the Arduino to set the O2 setpoint
 def write_O2(O2):
     O2 = "O2 " + str(O2) + "\n"
     O2 = O2.encode()
@@ -100,6 +104,7 @@ def write_StartStopPause(val):
         arduino.write("Pause\n".encode())
     time.sleep(0.02)
 
+#Reads the data coming from the Arduino over serial and splits it into a list
 def read_ArduinoLine():
     splitFloat = [0,0,0,0,0,0,0,0]
     data = arduino.readline()
@@ -115,20 +120,23 @@ def read_ArduinoLine():
         
     return splitFloat, data
     
-
+#writes whatever is passed in directly to the arduino
 def write_arduino(x):
     arduino.write(x.encode())
     time.sleep(0.05)
-    
+ 
+#Stores the data passed into splitFloat as a list into the passed in filename
 def write_CSV(splitFloat, fName):
     if(splitFloat[1] != 0):
         with open(fName, 'a',newline='') as f:
             writer = csv.writer(f, delimiter = ',')
             writer.writerow(splitFloat)
-            
+     
+#copies the file from src to dst, dst is a directory path and the file keeps the name it had at source
 def export_to_USB(src,dst):
     shutil.copy(src,dst)
-        
+
+#Checks if this is the first time a cell is clicked and gets rid of the grey text preloaded into it        
 def on_entry_click(eff=None, entry=None):
     """function that gets called whenever entry is clicked"""
     if entry != None:
@@ -136,12 +144,15 @@ def on_entry_click(eff=None, entry=None):
            entry.delete(0, "end") # delete all the text in the entry
            entry.insert(0, '') #Insert blank for user input
            entry.config(fg = 'black')
+           
+#If new text was not written into the cell it goes back to the preloaded filler
 def on_focusout(eff = None, entry = None, PreLoad = 'Filler'):
     if entry != None:
         if len(entry.get()) - entry.get().count(' ') < 1 :
             entry.insert(0, PreLoad)
             entry.config(fg = 'grey')
-
+            
+#Preloads the defined text into the passed in entry and assignes them to the on entry click and on focusout functions
 def preload_Text(entry = None, Preload = "Not Defined"):
     if(entry != None):
         entry.insert(0, Preload)
@@ -149,6 +160,7 @@ def preload_Text(entry = None, Preload = "Not Defined"):
         entry.bind('<FocusOut>', lambda eff: on_focusout(eff, entry, Preload))
         entry.config(fg = 'grey')
 
+#Creates the PID Settings window
 def create_window():
     upperWindow = tk.Toplevel(window)
     upperWindow.title("Hypoxia Chamber Settings GUI")
@@ -264,36 +276,39 @@ def create_window():
     upperWindow.rowconfigure([0,1,2,3], weight=1, minsize=50)
 #End of Upper Window
 
-
+#Lists the USB serial ports of the device
 def get_ports():
     ports = serial.tools.list_ports.comports()
     return ports
-def findArduinoLinux(ports):
+
+#Finds the arduino's USB port from the provided list, if none exist it returns None
+def findArduino(ports):
     comm = None
     for port in ports:
         if 'arduino' in str(port.manufacturer):
             comm = port.device
     return comm
 
+#connects to the arduio by calling get_ports() and findArduino()
 def connect_arduino():
     global arduino
     global arduinoConnected
     
     if(arduinoConnected == False):
-        port = findArduinoLinux(get_ports())
+        port = findArduino(get_ports())
         if port == None:
-            print("error")
+            print("error, arduino not connected")
             return
         else:
-            #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout = 0.1)
+            #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout = 0.1)  #Default port for the Raspberrypi when the arduino is connected
             arduino = serial.Serial(port=port, baudrate=115200, timeout=0.1)
             connect_button.config(bg = 'green')
             connect_button.config(text = 'Arduino\nConnected')
             arduinoConnected = True
+         
             
+#Tracks if the arduino is connected yet
 arduinoConnected = False
-
-
 
 #arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=.1)
 #The base declartion of the array for values to be stored into
