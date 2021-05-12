@@ -36,7 +36,7 @@ KiCO2_Preload = 5
 settings_Path =  "./settings.csv"
 
 #Read the values from settings.csv and store it into the appropriate global variables
-def read_Settings():
+def read_Settings(eff=None, o2_entry=None, co2_entry=None, press_entry=None):
     global O2_Preload
     global CO2_Preload
     global Pres_Preload
@@ -50,10 +50,17 @@ def read_Settings():
     with open(settings_Path, 'r') as f:
         reader = csv.reader(f)
         settings = next(reader)
-
+    
     O2_Preload = settings[0]
     CO2_Preload= settings[1]
     Pres_Preload = settings[2]
+    if(o2_entry != None):
+        o2_entry.delete(0,"end")
+        o2_entry.insert(0,str(O2_Preload))
+        co2_entry.delete(0,"end")
+        co2_entry.insert(0,CO2_Preload)
+        press_entry.delete(0,"end")
+        press_entry.insert(0,Pres_Preload)
     #filename_Preload = settings[3]
     #filePath_Preload = settings[4]
     Time_Preload = settings[5]
@@ -61,6 +68,7 @@ def read_Settings():
     KiO2_Preload = settings[7]
     KpCO2_Preload = settings[8]
     KiCO2_Preload = settings[9]
+    set_preloads()
     
 #Save the current settings to the CSV for future reads
 def write_Settings():
@@ -79,6 +87,27 @@ def write_Settings():
         writer = csv.writer(f, delimiter = ',')
         writer.writerow(settings)
 
+
+def set_preloads():
+    global O2_Preload
+    global CO2_Preload
+    global Pres_Preload
+    global filename_Preload
+    global filePath_Preload
+    global  Time_Preload
+    global  KpO2_Preload
+    global KiO2_Preload
+    global KpCO2_Preload
+    global KiCO2_Preload
+    if(arduinoConnected == True):
+        write_O2(O2_Preload)
+        write_CO2(CO2_Preload)
+        write_arduino("time " + Time_Preload)
+        write_arduino("KpO2 " + KpO2_Preload)
+        write_arduino("KiO2 " + KiO2_Preload)
+        write_arduino("KpCO2 " + KpCO2_Preload)
+        write_arduino("KiCO2 " + KiCO2_Preload)
+    
 
 #Write the passed in O2 value to the Arduino to set the O2 setpoint
 def write_O2(O2):
@@ -584,7 +613,8 @@ settings_button.grid(row=0, column = 0, padx=5, pady=5)
 save_settings_button = tk.Button(master = settings_frame, text = "Save Settings\nTo File", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=write_Settings)
 save_settings_button.grid(row=0, column = 1, padx=5)  
 
-Load_settings_button = tk.Button(master = settings_frame, text = "Load Settings\nFrom File", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=read_Settings)
+Load_settings_button = tk.Button(master = settings_frame, text = "Load Settings\nFrom File", background = ('silver'), width = 10, height = 2, relief = 'ridge', borderwidth = 5)
+Load_settings_button.bind('<Button>',lambda eff: read_Settings(eff, o2_entry, co2_entry, press_entry))
 Load_settings_button.grid(row=1, column = 1, padx=5)  
 
 connect_button = tk.Button(master = settings_frame, text = "Connect\nArduino", background = ('red'), width = 10, height = 2, relief = 'ridge', borderwidth = 5,command=connect_arduino)
